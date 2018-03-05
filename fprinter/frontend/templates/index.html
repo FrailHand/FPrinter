@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FPrinter web interface</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/uikit/css/uikit.min.css"/>
+    <script src="/static/uikit/js/uikit.min.js"></script>
+    <script src="/static/uikit/js/uikit-icons.min.js"></script>
+</head>
+<body>
+<div class="uk-container">
+    <div class="uk-tile-secondary uk-padding-large">
+        <div class="uk-container uk-margin-large-left">
+            <h1 class="uk-heading-primary uk-margin-remove-bottom">FPrinter</h1>
+            <h3 class="uk-margin-remove">Web interface</h3>
+        </div>
+    </div>
+
+    <div class="uk-child-width-1-2@s uk-margin uk-grid-small uk-grid-match" uk-grid>
+        <div>
+            <div class="uk-tile-primary uk-padding">
+                <h3 class="uk-heading-line uk-text-center"><span>Status</span></h3>
+                Printing status... ??
+            </div>
+        </div>
+        <div>
+            <div class="uk-tile uk-padding">
+                <h3 class="uk-heading-line uk-text-center"><span>Control panel</span>
+                </h3>
+                <div id="upload-panel">
+                    <div id="upload-zip" class="js-upload uk-width-1-3"
+                         uk-form-custom>
+                        <input type="file">
+                        <button class="uk-button uk-width-1-1 uk-button-default"
+                                type="button" tabindex="-1">Upload file
+                        </button>
+                    </div>
+
+                    <script id="invalid-template" type="text/template">
+                        <div id="alert-invalid" class="uk-alert-danger uk-animation-slid\
+e-top-small" uk-alert>
+                            <p>Please select valid .zip archive</p>
+                        </div>
+                    </script>
+                    <script id="success-template" type="text/template">
+                        <div id="alert-success" class="uk-alert-success uk-animation-slid\
+e-top-small" uk-alert>
+                            <p>File loaded</p>
+                        </div>
+                    </script>
+                </div>
+
+                <hr class="uk-divider-icon">
+                <div class="uk-margin">
+                    <button id="start-button" class="uk-button uk-width-1-3 uk-button-primary"
+                            disabled>Start
+                    </button>
+                </div>
+                <div>
+                    <button class="uk-button uk-width-1-3 uk-button-danger" disabled>
+                        Abort
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="/static/main.js"></script>
+</html>
