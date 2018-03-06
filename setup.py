@@ -2,8 +2,9 @@ from setuptools import setup, find_packages
 
 requires=[
     'pyramid',     
-    'waitress',                                                                 
-    'pyramid_jinja2',
+    'waitress',
+    'pyglet',
+    'cairocffi'
     ]
 
 
