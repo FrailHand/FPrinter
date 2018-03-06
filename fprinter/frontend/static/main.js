@@ -1,3 +1,16 @@
+function enable_button(id, enable){
+    button = document.getElementById(id);
+    if (enable) {
+        document.getElementById("start-button").removeAttribute("disabled");
+    }
+    else{
+	if (!button.hasAttribute('disabled')){
+            button.setAttribute('disabled', '');
+	}
+    }
+
+}
+
 UIkit.upload('#upload-zip', {
 
     url: '/upload',
@@ -5,39 +18,51 @@ UIkit.upload('#upload-zip', {
 
     completeAll: function (e) {
         //here is the response !!
-        console.log(e);
+	response = JSON.parse(e.response);
+	
+	if (response.valid){
+            var template = document.getElementById("success-template").innerHTML;
+	    template = Mustache.to_html(template, response);
+            document.getElementById("alert-upload").innerHTML = template;
 
-        if(document.getElementById('alert-invalid') !== null){
-            UIkit.alert('#alert-invalid').close();
+	    enable_button('start-button', true);
         }
+	else{
+	    var template = document.getElementById("error-template").innerHTML;
+	    template = Mustache.to_html(template, response);
+            document.getElementById("alert-upload").innerHTML = template;
 
-        alert_element = document.getElementById('alert-success');
-        var template = document.getElementById("success-template").innerHTML;
-        var node = document.createElement('div');
-        node.innerHTML = template;
-        document.getElementById("upload-panel").appendChild(node.firstElementChild);
-        if(alert_element !== null){
-            document.getElementById("upload-panel").removeChild(alert_element);
-            }
-
-        document.getElementById("start-button").removeAttribute("disabled");
+            enable_button('start-button', false);
+	}
     },
-    fail: function () {
-        start_but = document.getElementById('start-button');
-        if (!start_but.hasAttribute('disabled')){
-            start_but.setAttribute('disabled', '');
-        }
-        if(document.getElementById('alert-success') !== null){
-            UIkit.alert('#alert-success').close();
-        }
 
-        alert_element = document.getElementById('alert-invalid');
+    loadStart: function (e) {
+	bar=document.getElementById("js-progressbar");
+
+        var template = document.getElementById("progress-template").innerHTML;
+        document.getElementById("alert-upload").innerHTML = template;
+
+	if (bar !== null){
+            bar.max = e.total;
+            bar.value = e.loaded;
+	}
+    },
+
+    progress: function (e) {
+	bar=document.getElementById("js-progressbar");
+        bar.max = e.total;
+        bar.value = e.loaded;
+    },
+    
+    fail: function () {
+        enable_button('start-button', false);
+
+	alert_element = document.getElementById("alert-invalid");
         if(alert_element == null){
             var template = document.getElementById("invalid-template").innerHTML;
-            var node = document.createElement('div');
-            node.innerHTML = template;
-            document.getElementById("upload-panel").appendChild(node.firstElementChild);
+            document.getElementById("alert-upload").innerHTML = template;
         }
+	
         else {
             alert_element.classList.remove("uk-animation-shake");
             void alert_element.offsetWidth;
@@ -47,3 +72,18 @@ UIkit.upload('#upload-zip', {
     }
 
     });
+
+document.getElementById("start-button").onclick=function (){
+    enable_button("upload-button", false);
+
+    form = document.getElementById("input-zip");
+    if (!form.hasAttribute('hidden')){
+        form.setAttribute('hidden', '');
+    }
+
+    
+};
+
+document.getElementById("abort-button").onclick=function (){
+    console.log('abort');
+};
