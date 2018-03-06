@@ -3,7 +3,6 @@ from pyramid.response import FileResponse, Response
 import pyramid.httpexceptions as exc
 
 import os
-import zipfile
 import shutil
 
 @view_config(route_name='home')
@@ -20,20 +19,13 @@ def upload(request):
     files= request.POST['files[]']
 
     extension = files.filename.split('.')[-1]
-    if extension != 'zip':
+    if extension != 'svg':
         return {'valid':False, 'error':'invalid format: {}'.format(extension)}
     
     input_file = files.file
 
-    try:
-        with zipfile.ZipFile(input_file) as myzip:
-            print(myzip.infolist())
-            print('TODO: check that the file is valid for printing')
-            
-    except zipfile.BadZipFile as e:
-        return {'valid':False, 'error':str(e)}
-    
-    file_path = os.path.join('/tmp','bidon.zip')
+
+    file_path = os.path.join('/tmp','print.svg')
     temp_file = file_path+'~'
 
     input_file.seek(0)

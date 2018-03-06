@@ -11,10 +11,10 @@ function enable_button(id, enable){
 
 }
 
-UIkit.upload('#upload-zip', {
+UIkit.upload('#upload-svg', {
 
     url: '/upload',
-    allow: '*.zip',
+    allow: '*.svg',
 
     completeAll: function (e) {
         //here is the response !!
@@ -76,7 +76,7 @@ UIkit.upload('#upload-zip', {
 document.getElementById("start-button").onclick=function (){
     enable_button("upload-button", false);
 
-    form = document.getElementById("input-zip");
+    form = document.getElementById("input-svg");
     if (!form.hasAttribute('hidden')){
         form.setAttribute('hidden', '');
     }

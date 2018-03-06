@@ -3,8 +3,7 @@ from pyramid.config import Configurator
                                                                                 
 def main(global_config, **settings):
     print('\nLaunching the FPrinter frontend\n')
-    config = Configurator(settings=settings)                                    
-    config.include('pyramid_jinja2')                                            
+    config = Configurator(settings=settings)
     config.add_route('home', '/')
     config.add_route('upload', '/upload')
     config.scan('.views')
