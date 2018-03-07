@@ -4,7 +4,7 @@ requires=[
     'pyramid',     
     'waitress',
     'pyglet',
-    'cairocffi'
+    'cairosvg'
     ]
 
 

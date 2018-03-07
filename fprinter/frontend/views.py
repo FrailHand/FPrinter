@@ -6,6 +6,8 @@ import pyramid.httpexceptions as exc
 import os
 import shutil
 
+from ..backend.svg_slice_lib import check_valid_slic3r_svg
+
 templates_path = AssetResolver('fprinter.frontend').resolve('templates').abspath()
 
 def template(file):
@@ -27,9 +29,11 @@ def upload(request):
     extension = files.filename.split('.')[-1]
     if extension != 'svg':
         return {'valid':False, 'error':'invalid format: {}'.format(extension)}
-    
+
     input_file = files.file
 
+    if check_valid_slic3r_svg(input_file) != 0:
+        return {'valid': False, 'error': 'invalid svg syntax'}
 
     file_path = os.path.join('/tmp','print.svg')
     temp_file = file_path+'~'
