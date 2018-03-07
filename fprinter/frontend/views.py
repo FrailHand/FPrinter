@@ -1,13 +1,19 @@
 from  pyramid.view import view_config
 from pyramid.response import FileResponse, Response
+from pyramid.path import AssetResolver
 import pyramid.httpexceptions as exc
 
 import os
 import shutil
 
+templates_path = AssetResolver('fprinter.frontend').resolve('templates').abspath()
+
+def template(file):
+    return os.path.join(templates_path, file)
+
 @view_config(route_name='home')
 def home(request):
-    return FileResponse('templates/index.html')
+    return FileResponse(template('index.html'))
 
 @view_config(route_name='upload', renderer='json')
 def upload(request):
