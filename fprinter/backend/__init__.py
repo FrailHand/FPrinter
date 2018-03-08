@@ -1,3 +1,6 @@
+import signal
+
+
 def main():
     '''The main routine.'''
 
@@ -6,7 +9,14 @@ def main():
 
     print('\nLaunching the FPrinter backend\n')
 
-    Window()
+    window = Window()
+
+    def signal_handler(signal, frame):
+        print('\n\nKeyboard interrupt\n')
+        window.on_close()
+
+    signal.signal(signal.SIGINT, signal_handler)
+
     pyglet.app.run()
 
 
