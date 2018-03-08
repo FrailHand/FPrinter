@@ -8,7 +8,8 @@ def parse_svg(file_name):
         print('ERROR: invalid svg syntax')
         return
 
-    if svg_parser.findall("{http://www.w3.org/2000/svg}g")[0].get('{http://slic3r.org/namespaces/slic3r}z') is None:
+    if svg_parser.findall("{http://www.w3.org/2000/svg}g")[0].get(
+            '{http://slic3r.org/namespaces/slic3r}z') is None:
         print('ERROR: svg is not slic3r generated')
         return
 
@@ -18,7 +19,6 @@ def parse_svg(file_name):
     width = svg_parser.getroot().get('width')
 
     for i in svg_parser.findall("{http://www.w3.org/2000/svg}g"):
-
         svg_slice = xml.etree.ElementTree.Element('{http://www.w3.org/2000/svg}svg')
         svg_slice.set('height', height + 'mm')
         svg_slice.set('width', width + 'mm')
@@ -30,6 +30,7 @@ def parse_svg(file_name):
         slices_svg.append(svg_slice)
 
     return slices_svg
+
 
 def check_valid_slic3r_svg(file):
     '''
@@ -43,7 +44,8 @@ def check_valid_slic3r_svg(file):
     except xml.etree.ElementTree.ParseError:
         return -1
 
-    if svg_parser.findall("{http://www.w3.org/2000/svg}g")[0].get('{http://slic3r.org/namespaces/slic3r}z') is None:
+    if svg_parser.findall("{http://www.w3.org/2000/svg}g")[0].get(
+            '{http://slic3r.org/namespaces/slic3r}z') is None:
         return -2
 
     return 0

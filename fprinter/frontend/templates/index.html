@@ -29,47 +29,61 @@
             <div class="uk-tile uk-padding">
                 <h3 class="uk-heading-line uk-text-center"><span>Control panel</span>
                 </h3>
-                <div id="upload-svg" class="js-upload uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-margin" uk-form-custom>
+                <div id="upload-svg"
+                     class="js-upload uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-margin"
+                     uk-form-custom>
                     <input id="input-svg" type="file">
-                    <button id="upload-button" class="uk-button uk-width-1-1 uk-button-default" type="button" tabindex="-1">
-		      Upload file
+                    <button id="upload-button"
+                            class="uk-button uk-width-1-1 uk-button-default"
+                            type="button" tabindex="-1">
+                        Upload file
                     </button>
                 </div>
-		<div id="alert-upload">
-		    <div id="alert-initial" class="uk-alert-primary" uk-alert>
+                <div id="alert-upload">
+                    <div id="alert-initial" class="uk-alert-primary" uk-alert>
                         <p>Select the svg slices</p>
                     </div>
-		</div>
-		<script id="progress-template" type="text/template">
-		  <div class="uk-alert-primary" uk-alert>
-		    <progress id="js-progressbar" class="uk-progress" value="0" max="100"></progress>
- 		  </div>
-		</script>
+                </div>
+                <script id="progress-template" type="text/template">
+                    <div class="uk-alert-primary" uk-alert>
+                        <progress id="js-progressbar" class="uk-progress" value="0"
+                                  max="100"></progress>
+                    </div>
+                </script>
                 <script id="invalid-template" type="text/template">
-                    <div id="alert-invalid" class="uk-alert-warning uk-animation-slide-top-small" uk-alert>
+                    <div id="alert-invalid"
+                         class="uk-alert-warning uk-animation-slide-top-small"
+                         uk-alert>
                         <p>Please select valid .svg file</p>
                     </div>
                 </script>
                 <script id="error-template" type="text/template">
-                    <div id="alert-error" class="uk-alert-danger uk-animation-slide-top-small" uk-alert>
+                    <div id="alert-error"
+                         class="uk-alert-danger uk-animation-slide-top-small"
+                         uk-alert>
                         <p><b>Error</b>: {{error}}</p>
                     </div>
                 </script>
                 <script id="success-template" type="text/template">
-                    <div id="alert-success" class="uk-alert-success uk-animation-slide-top-small" uk-alert>
+                    <div id="alert-success"
+                         class="uk-alert-success uk-animation-slide-top-small"
+                         uk-alert>
                         <p>File <b>{{name}}</b> successfully uploaded</p>
                     </div>
                 </script>
-               
+
 
                 <hr class="uk-divider-icon">
                 <div class="uk-margin">
-                  <button id="start-button" class="uk-button uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-button-primary" disabled>
-		    Start
+                    <button id="start-button"
+                            class="uk-button uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-button-primary"
+                            disabled>
+                        Start
                     </button>
                 </div>
                 <div>
-                    <button class="uk-button uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-button-danger" disabled>
+                    <button class="uk-button uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-button-danger"
+                            disabled>
                         Abort
                     </button>
                 </div>
