@@ -7,9 +7,9 @@ import io
 import cairosvg
 import xml
 
-from . import constants
 from . import server_unix
-
+from .printer import Printer
+from .constants import message_code
 
 class Window(pyglet.window.Window):
 
@@ -19,6 +19,7 @@ class Window(pyglet.window.Window):
         self.set_mouse_visible(False)
 
         self.event_queue = queue.Queue()
+        self.printer = Printer()
 
         try:
             self.server = server_unix.Server(self.fire_event)
@@ -34,17 +35,18 @@ class Window(pyglet.window.Window):
             exit(1)
 
         pyglet.clock.schedule_interval(self.update, interval=1 / 60)
-        # from fprinter.backend.svg_slice_lib import parse_svg
-        # layers = parse_svg('/idiap/temp/fmarelli/tmp/fprinter/fprinter/tests/print.svg')
+
         # layer = layers[-1]
         #
         # stream = io.BytesIO()
-        # cairosvg.surface.PNGSurface.convert(bytestring=xml.etree.ElementTree.tostring(layer),
-        #                            write_to=stream, dpi=96, scale=1)
+        # cairosvg.surface.PNGSurface.convert(
+        #     bytestring=xml.etree.ElementTree.tostring(layer),
+        #     write_to=stream, dpi=96, scale=1)
         # image = pyglet.image.load('', file=stream)
         # stream.close()
         #
-        # self.test = pyglet.sprite.Sprite(image, x=self.width//2, y=self.height//2)
+        # self.test = pyglet.sprite.Sprite(image, x=self.width // 2,
+        #     y=self.height // 2)
 
     def fire_event(self, event):
         self.event_queue.put(event)
@@ -54,6 +56,19 @@ class Window(pyglet.window.Window):
         try:
             while True:
                 event = self.event_queue.get(block=False)
+                if event == event.FILE_LOADED:
+                    self.printer.load_svg()
+                    print('INFO: layers successfully loaded')
+
+                elif event == event.START_PRINTING:
+                    ok = self.printer.start()
+                    if ok == 0:
+                        self.server.send(message_code.CONFIRM)
+                    else:
+                        self.server.send(message_code.REFUSE)
+
+                else:
+                    print('WARNING: unknown event - {}'.format(event))
 
         except queue.Empty:
             pass
@@ -64,5 +79,5 @@ class Window(pyglet.window.Window):
 
     def on_close(self):
         super().on_close()
-        print('Display closed')
+        print('INFO: Display closed')
         self.server.stop()

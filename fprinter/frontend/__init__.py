@@ -19,6 +19,7 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.add_route('home', '/')
     config.add_route('upload', '/upload')
+    config.add_route('buttons', '/button/{type}')
     config.scan('.views')
     config.add_static_view(name='static', path='fprinter.frontend:static')
     return config.make_wsgi_app()

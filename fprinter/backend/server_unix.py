@@ -6,6 +6,7 @@ import threading
 import queue
 
 from . import constants
+from .constants import event, message_code
 
 
 class Server():
@@ -72,7 +73,7 @@ class Server():
             try:
                 connection, client = self.alive_socket.accept()
                 connection.close()
-                print('Alive socket triggered')
+                print('INFO: Alive socket triggered')
 
             except BlockingIOError:
                 time.sleep(1)
@@ -85,7 +86,7 @@ class Server():
         while self.running:
             try:
                 connection, client = self.server_socket.accept()
-                print('Connection incoming')
+                print('INFO: Connection incoming')
 
                 # the real UI must send the identification header within 5 seconds
                 connection.settimeout(5)
@@ -93,15 +94,15 @@ class Server():
                     received_data = connection.recv(8)
                 except socket.timeout:
                     connection.close()
-                    print('Connection timed out')
+                    print('WARNING: Connection timed out')
                     continue
 
                 if not received_data or received_data != constants.IDENTITY_HEADER:
                     connection.close()
-                    print('Invalid header')
+                    print('WARNING: Invalid header')
                     continue
 
-                print('Connection accepted!')
+                print('INFO: Connection accepted!')
                 connection.send(constants.CONFIRMATION_MESSAGE)
 
                 with self._queue.mutex:
@@ -115,9 +116,18 @@ class Server():
                     try:
                         received_data = connection.recv(16)
                         if received_data:
-                            # TODO fire event with received message
-                            print(received_data)
-                            pass
+
+                            if received_data == message_code.FILE_LOADED:
+                                self.fire_event(event.FILE_LOADED)
+
+                            elif received_data == message_code.START_BUTTON:
+                                self.fire_event(event.START_PRINTING)
+
+                            else:
+                                print(
+                                    'WARNING: unknown message on unix socket - {}'.format(
+                                        received_data))
+
                         else:
                             break
 
@@ -139,6 +149,7 @@ class Server():
 
             except BlockingIOError:
                 time.sleep(1)
+
         self.server_socket.close()
 
     def stop(self):
@@ -156,4 +167,4 @@ class Server():
         except OSError as e:
             print('ERROR: unlink socket - {}'.format(e))
 
-        print('Sockets correctly cleaned')
+        print('INFO: Sockets correctly cleaned')

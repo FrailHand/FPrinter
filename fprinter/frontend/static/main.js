@@ -1,14 +1,28 @@
 function enable_button(id, enable){
     button = document.getElementById(id);
     if (enable) {
-        document.getElementById("start-button").removeAttribute("disabled");
+        button.removeAttribute("disabled");
     }
     else{
-	if (!button.hasAttribute('disabled')){
-            button.setAttribute('disabled', '');
-	}
+        if (!button.hasAttribute('disabled')){
+                button.setAttribute('disabled', '');
+        }
     }
 
+}
+
+function enable_upload(enable){
+    enable_button("upload-button", enable);
+
+    form = document.getElementById("input-svg");
+    if(enable){
+        form.removeAttribute("hidden");
+    }
+    else{
+        if (!form.hasAttribute('hidden')){
+            form.setAttribute('hidden', '');
+        }
+    }
 }
 
 UIkit.upload('#upload-svg', {
@@ -17,11 +31,10 @@ UIkit.upload('#upload-svg', {
     allow: '*.svg',
 
     completeAll: function (e) {
-        //here is the response !!
 	response = JSON.parse(e.response);
 	
 	if (response.valid){
-            var template = document.getElementById("success-template").innerHTML;
+            var template = document.getElementById("file-success-template").innerHTML;
 	    template = Mustache.to_html(template, response);
             document.getElementById("alert-upload").innerHTML = template;
 
@@ -74,12 +87,39 @@ UIkit.upload('#upload-svg', {
     });
 
 document.getElementById("start-button").onclick=function (){
-    enable_button("upload-button", false);
+    enable_upload(false);
 
-    form = document.getElementById("input-svg");
-    if (!form.hasAttribute('hidden')){
-        form.setAttribute('hidden', '');
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open('GET', "/button/start", true);
+    xmlHttp.open('GET', "/button/start", true);
+
+    xmlHttp.onreadystatechange = function() {
+
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+            var response = JSON.parse(xmlHttp.response);
+
+            if (response.valid){
+                var template = document.getElementById("info-template").innerHTML;
+	            template = Mustache.to_html(template,  {"info":"Printing in progress..."});
+                document.getElementById("alert-buttons").innerHTML = template;
+
+                enable_button('start-button', false);
+                enable_button('pause-button', true);
+                enable_button('abort-button', true);
+
+            }
+            else{
+                var template = document.getElementById("error-template").innerHTML;
+	            template = Mustache.to_html(template, response);
+                document.getElementById("alert-buttons").innerHTML = template;
+
+                enable_upload(true);
+            }
+
+        }
     }
+
+    xmlHttp.send(null);
 
     
 };

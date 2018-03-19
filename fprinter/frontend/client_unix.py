@@ -26,10 +26,16 @@ class Client():
             raise Exception('no answer from backend')
 
     def request(self, message):
+        # send a message and wait for answer
         with self.mutex:
             self.backend_socket.send(message)
 
             return self.backend_socket.recv(8)
 
+    def send(self, message):
+        # send a message without waiting for answer
+        # NO RESPONSE SHOULD BE SENT it could break the pipeline
+        with self.mutex:
+            self.backend_socket.send(message)
 
 

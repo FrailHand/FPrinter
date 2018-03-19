@@ -7,6 +7,7 @@ import os
 import shutil
 
 from . import backend_socket
+from ..backend import constants
 from ..backend.svg_slice_lib import check_valid_slic3r_svg
 
 templates_path = AssetResolver('fprinter.frontend').resolve('templates').abspath()
@@ -19,6 +20,23 @@ def template(file):
 @view_config(route_name='home')
 def home(request):
     return FileResponse(template('index.html'))
+
+
+@view_config(route_name='buttons', renderer='json')
+def buttons(request):
+    type = request.matchdict['type']
+    if type == 'start':
+        try:
+            backend_response = backend_socket.request(constants.message_code.START_BUTTON)
+            if backend_response == constants.message_code.CONFIRM:
+                return {'valid': True}
+            else:
+                return {'valid': False, 'error': 'failed to start printing'}
+
+        except Exception as e:
+            return {'valid': False, 'error':str(e)}
+    else:
+        return {'valid': False, 'error':'invalid button name'}
 
 
 @view_config(route_name='upload', renderer='json')
@@ -39,13 +57,17 @@ def upload(request):
     if check_valid_slic3r_svg(input_file) != 0:
         return {'valid': False, 'error': 'invalid svg syntax'}
 
-    file_path = os.path.join('/tmp', 'print.svg')
-    temp_file = file_path + '~'
+    temp_file = constants.SVG_FILE + '~'
 
     input_file.seek(0)
     with open(temp_file, 'wb') as output_file:
         shutil.copyfileobj(input_file, output_file)
 
-    os.rename(temp_file, file_path)
+    os.rename(temp_file, constants.SVG_FILE)
+
+    with open(constants.SVG_NAME, 'w') as output_file:
+        output_file.write(files.filename)
+
+    backend_socket.send(constants.message_code.FILE_LOADED)
 
     return {'valid': True, 'name': files.filename}
