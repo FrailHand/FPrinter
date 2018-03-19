@@ -25,6 +25,74 @@ function enable_upload(enable){
     }
 }
 
+function update_status(){
+    var httpRequest = new XMLHttpRequest();
+    httpRequest.open('GET', "/status?time="+(new Date()).getTime(), true);
+
+    httpRequest.onreadystatechange = function() {
+
+        if (httpRequest.readyState == 4 && httpRequest.status == 200){
+            var response = JSON.parse(httpRequest.response);
+
+            if (response.in_progress){
+                enable_upload(false);
+
+                var template = document.getElementById("file-success-template").innerHTML;
+                template = Mustache.to_html(template, response);
+                document.getElementById("alert-upload").innerHTML = template;
+
+                enable_button('start-button', true);
+                enable_button('abort-button', true);
+
+                pause_button = document.getElementById("start-button");
+
+                if (response.paused){
+                    pause_button.innerHTML = "resume";
+
+                    pause_button.classList.remove("uk-button-secondary");
+                    pause_button.classList.add("uk-button-primary");
+
+                    var template = document.getElementById("info-template").innerHTML;
+                    template = Mustache.to_html(template,  {"info":"Print paused"});
+                    document.getElementById("alert-buttons").innerHTML = template;
+                }
+                else{
+                    pause_button.innerHTML = "pause";
+
+                    pause_button.classList.remove("uk-button-primary");
+                    pause_button.classList.add("uk-button-secondary");
+
+                    var template = document.getElementById("info-template").innerHTML;
+                    template = Mustache.to_html(template,  {"info":"Print in progress..."});
+                    document.getElementById("alert-buttons").innerHTML = template;
+                }
+            }
+
+            else{
+                document.getElementById("start-button").innerHTML = "start";
+                enable_button('abort-button', false);
+
+                enable_upload(true);
+
+                if (response.name !== ""){
+                    var template = document.getElementById("file-success-template").innerHTML;
+                    template = Mustache.to_html(template, response);
+                    document.getElementById("alert-upload").innerHTML = template;
+                    enable_button("start-button", true);
+                }
+
+                else{
+                    enable_button("start-button", false);
+                }
+
+            }
+
+        }
+    }
+
+    httpRequest.send();
+}
+
 UIkit.upload('#upload-svg', {
 
     url: '/upload',
@@ -34,12 +102,13 @@ UIkit.upload('#upload-svg', {
 	response = JSON.parse(e.response);
 	
 	if (response.valid){
-            var template = document.getElementById("file-success-template").innerHTML;
-	    template = Mustache.to_html(template, response);
-            document.getElementById("alert-upload").innerHTML = template;
+        var template = document.getElementById("file-success-template").innerHTML;
+        template = Mustache.to_html(template, response);
+        document.getElementById("alert-upload").innerHTML = template;
 
-	    enable_button('start-button', true);
-        }
+        enable_button("start-button", true);
+
+    }
 	else{
 	    var template = document.getElementById("error-template").innerHTML;
 	    template = Mustache.to_html(template, response);
@@ -81,49 +150,107 @@ UIkit.upload('#upload-svg', {
             void alert_element.offsetWidth;
             alert_element.classList.add("uk-animation-shake");
         }
-
     }
 
     });
 
 document.getElementById("start-button").onclick=function (){
-    enable_upload(false);
+    enable_button("start-button", false);
 
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open('GET', "/button/start", true);
-    xmlHttp.open('GET', "/button/start", true);
+    var button_label = document.getElementById("start-button").innerHTML;
+    if (button_label == "start"){
 
-    xmlHttp.onreadystatechange = function() {
-
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
-            var response = JSON.parse(xmlHttp.response);
-
-            if (response.valid){
-                var template = document.getElementById("info-template").innerHTML;
-	            template = Mustache.to_html(template,  {"info":"Printing in progress..."});
-                document.getElementById("alert-buttons").innerHTML = template;
-
-                enable_button('start-button', false);
-                enable_button('pause-button', true);
-                enable_button('abort-button', true);
-
+        enable_upload(false);
+    
+        var startRequest = new XMLHttpRequest();
+        startRequest.open('GET', "/button/start?time="+(new Date()).getTime(), true);
+    
+        startRequest.onreadystatechange = function() {
+    
+            if (startRequest.readyState == 4 && startRequest.status == 200){
+                var response = JSON.parse(startRequest.response);
+    
+                if (response.valid){
+                    update_status();
+    
+                }
+                else{
+                    var template = document.getElementById("error-template").innerHTML;
+                    template = Mustache.to_html(template, response);
+                    document.getElementById("alert-buttons").innerHTML = template;
+    
+                    enable_upload(true);
+                    enable_button("start-button", true);
+                }
+    
             }
-            else{
-                var template = document.getElementById("error-template").innerHTML;
-	            template = Mustache.to_html(template, response);
-                document.getElementById("alert-buttons").innerHTML = template;
-
-                enable_upload(true);
-            }
-
         }
+    
+        startRequest.send();
     }
+    else{
+        var pauseRequest = new XMLHttpRequest();
+        pauseRequest.open('GET', "/button/"+button_label+"?time="+(new Date()).getTime(), true);
 
-    xmlHttp.send(null);
+        pauseRequest.onreadystatechange = function() {
 
+            if (pauseRequest.readyState == 4 && pauseRequest.status == 200){
+                var response = JSON.parse(pauseRequest.response);
+
+                if (response.valid){
+                    update_status();
+                }
+                else{
+                    var template = document.getElementById("error-template").innerHTML;
+                    template = Mustache.to_html(template, response);
+                    document.getElementById("alert-buttons").innerHTML = template;
+
+                    enable_button("start-button", true);
+                }
+            }
+        }
+
+        pauseRequest.send();
+    }
     
 };
 
 document.getElementById("abort-button").onclick=function (){
-    console.log('abort');
+    var abortRequest = new XMLHttpRequest();
+    abortRequest.open('GET', "/button/abort?time="+(new Date()).getTime(), true);
+
+    abortRequest.onreadystatechange = function() {
+
+        if (abortRequest.readyState == 4 && abortRequest.status == 200){
+            if (response.valid){
+                update_status();
+
+                var template = document.getElementById("info-template").innerHTML;
+                template = Mustache.to_html(template,  {"info":"Print aborted"});
+                document.getElementById("alert-buttons").innerHTML = template;
+
+                var template = document.getElementById("info-template").innerHTML;
+                template = Mustache.to_html(template,  {"info":"Select the svg slices"});
+                document.getElementById("alert-upload").innerHTML = template;
+
+                enable_button("start-button", true);
+            }
+
+            else{
+                var template = document.getElementById("error-template").innerHTML;
+                template = Mustache.to_html(template, response);
+                document.getElementById("alert-buttons").innerHTML = template;
+
+                enable_button("start-button", true);
+            }
+
+
+        }
+    }
+
+    abortRequest.send();
+
+
 };
+
+update_status();

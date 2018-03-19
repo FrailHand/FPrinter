@@ -123,6 +123,15 @@ class Server():
                             elif received_data == message_code.START_BUTTON:
                                 self.fire_event(event.START_PRINTING)
 
+                            elif received_data == message_code.PAUSE_BUTTON:
+                                self.fire_event(event.PAUSE)
+
+                            elif received_data == message_code.RESUME_BUTTON:
+                                self.fire_event(event.RESUME)
+
+                            elif received_data == message_code.ABORT_BUTTON:
+                                self.fire_event(event.ABORT)
+
                             else:
                                 print(
                                     'WARNING: unknown message on unix socket - {}'.format(

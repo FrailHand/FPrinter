@@ -21,6 +21,10 @@ def template(file):
 def home(request):
     return FileResponse(template('index.html'))
 
+@view_config(route_name='status')
+def status(request):
+    return FileResponse(constants.PRINTER_STATUS)
+
 
 @view_config(route_name='buttons', renderer='json')
 def buttons(request):
@@ -35,6 +39,40 @@ def buttons(request):
 
         except Exception as e:
             return {'valid': False, 'error':str(e)}
+
+    elif type=='pause':
+        try:
+            backend_response = backend_socket.request(constants.message_code.PAUSE_BUTTON)
+            if backend_response == constants.message_code.CONFIRM:
+                return {'valid': True}
+            else:
+                return {'valid': False, 'error': 'failed to pause printing'}
+
+        except Exception as e:
+            return {'valid': False, 'error':str(e)}
+
+    elif type=='resume':
+        try:
+            backend_response = backend_socket.request(constants.message_code.RESUME_BUTTON)
+            if backend_response == constants.message_code.CONFIRM:
+                return {'valid': True}
+            else:
+                return {'valid': False, 'error': 'failed to resume printing'}
+
+        except Exception as e:
+            return {'valid': False, 'error':str(e)}
+
+    elif type=='abort':
+        try:
+            backend_response = backend_socket.request(constants.message_code.ABORT_BUTTON)
+            if backend_response == constants.message_code.CONFIRM:
+                return {'valid': True}
+            else:
+                return {'valid': False, 'error': 'failed to abort printing'}
+
+        except Exception as e:
+            return {'valid': False, 'error':str(e)}
+
     else:
         return {'valid': False, 'error':'invalid button name'}
 

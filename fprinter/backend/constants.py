@@ -9,7 +9,8 @@ IDENTITY_HEADER = b'FPrinter'
 CONFIRMATION_MESSAGE = b'1'
 
 SVG_FILE = os.path.join(MAIN_DIR, 'layers.svg')
-SVG_NAME = os.path.join(MAIN_DIR, 'svg.name')
+SVG_NAME = os.path.join(MAIN_DIR, 'svg_name')
+PRINTER_STATUS = os.path.join(MAIN_DIR, 'status.dict')
 
 
 class message_code:
@@ -18,6 +19,9 @@ class message_code:
     '''
     FILE_LOADED = b'loaded'
     START_BUTTON = b'start'
+    PAUSE_BUTTON = b'pause'
+    RESUME_BUTTON = b'resume'
+    ABORT_BUTTON = b'abort'
     CONFIRM = b'OK'
     REFUSE = b'KO'
 
@@ -29,3 +33,6 @@ class event(Enum):
 
     FILE_LOADED = auto()
     START_PRINTING = auto()
+    ABORT = auto()
+    PAUSE = auto()
+    RESUME = auto()

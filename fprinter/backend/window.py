@@ -11,6 +11,7 @@ from . import server_unix
 from .printer import Printer
 from .constants import message_code
 
+
 class Window(pyglet.window.Window):
 
     def __init__(self):
@@ -66,6 +67,24 @@ class Window(pyglet.window.Window):
                         self.server.send(message_code.CONFIRM)
                     else:
                         self.server.send(message_code.REFUSE)
+
+                elif event == event.PAUSE:
+                    ok = self.printer.pause()
+                    if ok == 0:
+                        self.server.send(message_code.CONFIRM)
+                    else:
+                        self.server.send(message_code.REFUSE)
+
+                elif event == event.RESUME:
+                    ok = self.printer.resume()
+                    if ok == 0:
+                        self.server.send(message_code.CONFIRM)
+                    else:
+                        self.server.send(message_code.REFUSE)
+
+                elif event == event.ABORT:
+                    self.printer.abort()
+                    self.server.send(message_code.CONFIRM)
 
                 else:
                     print('WARNING: unknown event - {}'.format(event))
