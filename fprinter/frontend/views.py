@@ -7,6 +7,7 @@ import os
 import shutil
 
 from . import backend_socket
+from . import access_provider
 from ..backend import constants
 from ..backend.svg_slice_lib import check_valid_slic3r_svg
 
@@ -19,15 +20,31 @@ def template(file):
 
 @view_config(route_name='home')
 def home(request):
-    return FileResponse(template('index.html'))
+    if access_provider.allow(request.session):
+        return FileResponse(template('index.html'))
+
+    else:
+        return FileResponse(template('index_busy.html'))
+
 
 @view_config(route_name='status')
 def status(request):
     return FileResponse(constants.PRINTER_STATUS)
 
+@view_config(route_name='ping', renderer='json')
+def ping(request):
+    if access_provider.allow(request.session):
+        return {'valid': True}
+
+    else:
+        return {'valid': False, 'error': 'unauthorized session'}
+
 
 @view_config(route_name='buttons', renderer='json')
 def buttons(request):
+    if not access_provider.allow(request.session):
+        return {'valid': False, 'error': 'unauthorized session'}
+
     type = request.matchdict['type']
     if type == 'start':
         try:
@@ -79,6 +96,9 @@ def buttons(request):
 
 @view_config(route_name='upload', renderer='json')
 def upload(request):
+    if not access_provider.allow(request.session):
+        return {'valid': False, 'error': 'unauthorized session'}
+
     if request.content_length >= 1e9:
         return {'valid': False, 'error': 'file too big'}
 
