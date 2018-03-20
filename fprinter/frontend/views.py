@@ -18,18 +18,15 @@ def template(file):
     return os.path.join(templates_path, file)
 
 
-@view_config(route_name='home')
+@view_config(route_name='home', renderer='templates/index.jinja2')
 def home(request):
-    if access_provider.allow(request.session):
-        return FileResponse(template('index.html'))
-
-    else:
-        return FileResponse(template('index_busy.html'))
+    return {'granted': access_provider.allow(request.session)}
 
 
 @view_config(route_name='status')
 def status(request):
     return FileResponse(constants.PRINTER_STATUS)
+
 
 @view_config(route_name='ping', renderer='json')
 def ping(request):
@@ -55,9 +52,9 @@ def buttons(request):
                 return {'valid': False, 'error': 'failed to start printing'}
 
         except Exception as e:
-            return {'valid': False, 'error':str(e)}
+            return {'valid': False, 'error': str(e)}
 
-    elif type=='pause':
+    elif type == 'pause':
         try:
             backend_response = backend_socket.request(constants.message_code.PAUSE_BUTTON)
             if backend_response == constants.message_code.CONFIRM:
@@ -66,9 +63,9 @@ def buttons(request):
                 return {'valid': False, 'error': 'failed to pause printing'}
 
         except Exception as e:
-            return {'valid': False, 'error':str(e)}
+            return {'valid': False, 'error': str(e)}
 
-    elif type=='resume':
+    elif type == 'resume':
         try:
             backend_response = backend_socket.request(constants.message_code.RESUME_BUTTON)
             if backend_response == constants.message_code.CONFIRM:
@@ -77,9 +74,9 @@ def buttons(request):
                 return {'valid': False, 'error': 'failed to resume printing'}
 
         except Exception as e:
-            return {'valid': False, 'error':str(e)}
+            return {'valid': False, 'error': str(e)}
 
-    elif type=='abort':
+    elif type == 'abort':
         try:
             backend_response = backend_socket.request(constants.message_code.ABORT_BUTTON)
             if backend_response == constants.message_code.CONFIRM:
@@ -88,10 +85,10 @@ def buttons(request):
                 return {'valid': False, 'error': 'failed to abort printing'}
 
         except Exception as e:
-            return {'valid': False, 'error':str(e)}
+            return {'valid': False, 'error': str(e)}
 
     else:
-        return {'valid': False, 'error':'invalid button name'}
+        return {'valid': False, 'error': 'invalid button name'}
 
 
 @view_config(route_name='upload', renderer='json')

@@ -29,6 +29,9 @@
             <div class="uk-tile uk-padding">
                 <h3 class="uk-heading-line uk-text-center"><span>Control panel</span>
                 </h3>
+
+                {% if granted %}
+
                 <div id="upload-svg"
                      class="js-upload uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-margin"
                      uk-form-custom>
@@ -100,6 +103,13 @@
                         abort
                     </button>
                 </div>
+
+                {% else %}
+
+                <div id="busy" class="uk-alert uk-alert-danger">Control panel busy</div>
+
+                {% endif %}
+
             </div>
         </div>
     </div>
@@ -107,5 +117,9 @@
 
 </body>
 <script src="/static/common.js"></script>
+
+{% if granted %}
 <script src="/static/main.js"></script>
+{% endif %}
+
 </html>

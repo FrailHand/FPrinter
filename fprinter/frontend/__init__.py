@@ -25,6 +25,9 @@ def main(global_config, **settings):
     session_factory = SignedCookieSessionFactory('fy3JUe.4')
     config.set_session_factory(session_factory)
 
+    # use jinja for templating
+    config.include('pyramid_jinja2')
+
     config.add_route('home', '/')
     config.add_route('upload', '/upload')
     config.add_route('status', '/status')
