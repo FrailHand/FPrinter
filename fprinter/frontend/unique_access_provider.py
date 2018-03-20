@@ -16,7 +16,7 @@ class Unique():
             current = time.time()
             if current - self.last_ping > 3 * constants.UI_PING_INTERVAL:
                 self.last_ping = current
-                self.authorized_ID = random.randint()
+                self.authorized_ID = random.randint(1,99999)
                 return self.authorized_ID
 
         return 0

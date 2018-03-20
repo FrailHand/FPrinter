@@ -1,4 +1,9 @@
-var authenticated = -1
+var authenticated = false;
+
+busy_div = document.getElementById("busy");
+if(busy_div == null){
+    authenticated = true;
+}
 
 function ping_server(){
     var pingRequest = new XMLHttpRequest();
@@ -8,10 +13,6 @@ function ping_server(){
 
         if (pingRequest.readyState == 4 && pingRequest.status == 200){
             var response = JSON.parse(pingRequest.response);
-
-            if (authenticated == -1){
-                authenticated = response.valid
-            }
 
             if (response.valid != authenticated){
                 location.reload(true);
