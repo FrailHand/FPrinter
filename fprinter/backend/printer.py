@@ -21,10 +21,10 @@ class Printer():
         if purge:
             self.layers = []
             self.name = ''
+            self.current_layer = -1
 
         self.printing_in_progress = False
         self.is_paused = False
-        self.current_layer = -1
         self.layer_timestamp = -1
         self.paused_exposition = 0
 

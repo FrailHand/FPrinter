@@ -66,6 +66,10 @@ function visual_status_update(status){
         status['label-title']='STOPPED';
     }
 
+    if (status['current_layer'] > status['max_layer']){
+        status['current_layer'] = status['max_layer']
+    }
+
     status_template(status);
 }
 

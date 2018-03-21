@@ -71,7 +71,11 @@ function update_status(){
             }
 
             else{
-                document.getElementById("start-button").innerHTML = "start";
+                start_button = document.getElementById("start-button");
+                start_button.innerHTML = "start";
+                start_button.classList.remove("uk-button-secondary");
+                start_button.classList.add("uk-button-primary");
+
                 enable_button('abort-button', false);
 
                 enable_upload(true);
@@ -88,6 +92,13 @@ function update_status(){
                 }
 
             }
+
+            if (httpresponse.current_layer == httpresponse.max_layer + 1){
+                var template = document.getElementById("info-template").innerHTML;
+                template = Mustache.to_html(template,  {"info":"Print finished!"});
+                document.getElementById("alert-buttons").innerHTML = template;
+            }
+
             visual_status_update(httpresponse);
         }
     }
@@ -217,7 +228,7 @@ document.getElementById("start-button").onclick=function (){
     
 };
 
-document.getElementById("abort-button").onclick=function (){
+document.getElementById("abort-button-confirmed").onclick=function (){
     var abortRequest = new XMLHttpRequest();
     abortRequest.open('GET', "/button/abort?time="+(new Date()).getTime(), true);
 
