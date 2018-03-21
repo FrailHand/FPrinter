@@ -20,6 +20,8 @@ LAYER_PNG = os.path.join(MAIN_DIR, 'layer.png')
 UI_PING_INTERVAL = 1
 SESSION_AUTH_KEY = 'auth_ID'
 
+EXPOSITION_TIME = 0.125
+
 class message_code:
     '''
     Message codes for the unix communication

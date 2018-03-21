@@ -3,10 +3,6 @@ import queue
 import pyglet
 from pyglet.gl import *
 
-import io
-import cairosvg
-import xml
-
 from . import server_unix
 from .printer import Printer
 from .constants import message_code
@@ -20,7 +16,7 @@ class Window(pyglet.window.Window):
         self.set_mouse_visible(False)
 
         self.event_queue = queue.Queue()
-        self.printer = Printer()
+        self.printer = Printer(self)
 
         try:
             self.server = server_unix.Server(self.fire_event)
@@ -36,18 +32,6 @@ class Window(pyglet.window.Window):
             exit(1)
 
         pyglet.clock.schedule_interval(self.update, interval=1 / 60)
-
-        # layer = layers[-1]
-        #
-        # stream = io.BytesIO()
-        # cairosvg.surface.PNGSurface.convert(
-        #     bytestring=xml.etree.ElementTree.tostring(layer),
-        #     write_to=stream, dpi=96, scale=1)
-        # image = pyglet.image.load('', file=stream)
-        # stream.close()
-        #
-        # self.test = pyglet.sprite.Sprite(image, x=self.width // 2,
-        #     y=self.height // 2)
 
     def fire_event(self, event):
         self.event_queue.put(event)
@@ -92,9 +76,7 @@ class Window(pyglet.window.Window):
         except queue.Empty:
             pass
 
-    def on_draw(self):
-        self.clear()
-        # self.test.draw()
+        self.printer.update()
 
     def on_close(self):
         super().on_close()

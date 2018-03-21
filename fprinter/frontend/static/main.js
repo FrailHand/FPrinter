@@ -33,13 +33,13 @@ function update_status(){
     httpRequest.onreadystatechange = function() {
 
         if (httpRequest.readyState == 4 && httpRequest.status == 200){
-            var response = JSON.parse(httpRequest.response);
+            var httpresponse = JSON.parse(httpRequest.response);
 
-            if (response.in_progress){
+            if (httpresponse.in_progress){
                 enable_upload(false);
 
                 var template = document.getElementById("file-success-template").innerHTML;
-                template = Mustache.to_html(template, response);
+                template = Mustache.to_html(template, httpresponse);
                 document.getElementById("alert-upload").innerHTML = template;
 
                 enable_button('start-button', true);
@@ -47,7 +47,7 @@ function update_status(){
 
                 pause_button = document.getElementById("start-button");
 
-                if (response.paused){
+                if (httpresponse.paused){
                     pause_button.innerHTML = "resume";
 
                     pause_button.classList.remove("uk-button-secondary");
@@ -76,9 +76,9 @@ function update_status(){
 
                 enable_upload(true);
 
-                if (response.name !== ""){
+                if (httpresponse.name !== ""){
                     var template = document.getElementById("file-success-template").innerHTML;
-                    template = Mustache.to_html(template, response);
+                    template = Mustache.to_html(template, httpresponse);
                     document.getElementById("alert-upload").innerHTML = template;
                     enable_button("start-button", true);
                 }
@@ -88,7 +88,7 @@ function update_status(){
                 }
 
             }
-            visual_status_update(response);
+            visual_status_update(httpresponse);
         }
     }
 
@@ -101,11 +101,11 @@ UIkit.upload('#upload-svg', {
     allow: '*.svg',
 
     completeAll: function (e) {
-	response = JSON.parse(e.response);
+	uploadresponse = JSON.parse(e.response);
 	
-	if (response.valid){
+	if (uploadresponse.valid){
         var template = document.getElementById("file-success-template").innerHTML;
-        template = Mustache.to_html(template, response);
+        template = Mustache.to_html(template, uploadresponse);
         document.getElementById("alert-upload").innerHTML = template;
 
         enable_button("start-button", true);
@@ -113,7 +113,7 @@ UIkit.upload('#upload-svg', {
     }
 	else{
 	    var template = document.getElementById("error-template").innerHTML;
-	    template = Mustache.to_html(template, response);
+	    template = Mustache.to_html(template, uploadresponse);
             document.getElementById("alert-upload").innerHTML = template;
 
             enable_button('start-button', false);
@@ -170,15 +170,15 @@ document.getElementById("start-button").onclick=function (){
         startRequest.onreadystatechange = function() {
     
             if (startRequest.readyState == 4 && startRequest.status == 200){
-                var response = JSON.parse(startRequest.response);
+                var startresponse = JSON.parse(startRequest.response);
     
-                if (response.valid){
+                if (startresponse.valid){
                     update_status();
     
                 }
                 else{
                     var template = document.getElementById("error-template").innerHTML;
-                    template = Mustache.to_html(template, response);
+                    template = Mustache.to_html(template, startresponse);
                     document.getElementById("alert-buttons").innerHTML = template;
     
                     enable_upload(true);
@@ -197,14 +197,14 @@ document.getElementById("start-button").onclick=function (){
         pauseRequest.onreadystatechange = function() {
 
             if (pauseRequest.readyState == 4 && pauseRequest.status == 200){
-                var response = JSON.parse(pauseRequest.response);
+                var pauseresponse = JSON.parse(pauseRequest.response);
 
-                if (response.valid){
+                if (pauseresponse.valid){
                     update_status();
                 }
                 else{
                     var template = document.getElementById("error-template").innerHTML;
-                    template = Mustache.to_html(template, response);
+                    template = Mustache.to_html(template, pauseresponse);
                     document.getElementById("alert-buttons").innerHTML = template;
 
                     enable_button("start-button", true);
@@ -224,8 +224,8 @@ document.getElementById("abort-button").onclick=function (){
     abortRequest.onreadystatechange = function() {
 
         if (abortRequest.readyState == 4 && abortRequest.status == 200){
-            var response = JSON.parse(abortRequest.response);
-            if (response.valid){
+            var abortresponse = JSON.parse(abortRequest.response);
+            if (abortresponse.valid){
                 update_status();
 
                 var template = document.getElementById("info-template").innerHTML;
@@ -241,7 +241,7 @@ document.getElementById("abort-button").onclick=function (){
 
             else{
                 var template = document.getElementById("error-template").innerHTML;
-                template = Mustache.to_html(template, response);
+                template = Mustache.to_html(template, abortresponse);
                 document.getElementById("alert-buttons").innerHTML = template;
 
                 enable_button("start-button", true);

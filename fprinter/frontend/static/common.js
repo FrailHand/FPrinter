@@ -13,9 +13,9 @@ function ping_server(){
     pingRequest.onreadystatechange = function() {
 
         if (pingRequest.readyState == 4 && pingRequest.status == 200){
-            var response = JSON.parse(pingRequest.response);
+            var pingresponse = JSON.parse(pingRequest.response);
 
-            if (response.valid != authenticated){
+            if (pingresponse.valid != authenticated){
                 location.reload(true);
             }
         }
@@ -57,12 +57,14 @@ function visual_status_update(status){
     else {
         if (current_layer!=-1){
             update_layer_image(-1);
+            if (typeof update_status !== 'undefined'){
+                update_status();
+            }
         }
 
         status['label-class']='danger';
         status['label-title']='STOPPED';
     }
-
 
     status_template(status);
 }
@@ -73,8 +75,8 @@ function request_status(){
 
     statusRequest.onreadystatechange = function() {
         if (statusRequest.readyState == 4 && statusRequest.status == 200){
-            var response = JSON.parse(statusRequest.response);
-            visual_status_update(response);
+            var statusresponse = JSON.parse(statusRequest.response);
+            visual_status_update(statusresponse);
         }
     }
     statusRequest.send();
