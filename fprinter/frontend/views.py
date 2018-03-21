@@ -27,6 +27,15 @@ def home(request):
 def status(request):
     return FileResponse(constants.PRINTER_STATUS)
 
+@view_config(route_name='layer')
+def layer(request):
+
+    if os.path.exists(constants.LAYER_PNG):
+        return FileResponse(constants.LAYER_PNG)
+
+    else:
+        raise exc.HTTPFound("/static/void.png")
+
 
 @view_config(route_name='ping', renderer='json')
 def ping(request):

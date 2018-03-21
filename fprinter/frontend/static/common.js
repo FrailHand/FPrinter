@@ -1,4 +1,5 @@
 var authenticated = false;
+var current_layer = -2;
 
 busy_div = document.getElementById("busy");
 if(busy_div == null){
@@ -24,3 +25,59 @@ function ping_server(){
 }
 
 var ping_scheduler =  setInterval(ping_server, 1000);
+
+function update_layer_image(layer){
+    current_layer = layer;
+    document.getElementById("current-layer").src = ("/layer.png?time="+(new Date()).getTime())
+}
+
+function status_template(status){
+    var template = document.getElementById("printing-status-template").innerHTML;
+    template = Mustache.to_html(template, status);
+    document.getElementById("printing-status").innerHTML = template;
+}
+
+function visual_status_update(status){
+    if (status.in_progress){
+
+        if (status.current_layer!=current_layer){
+            update_layer_image(status.current_layer);
+        }
+
+        if (status.paused){
+            status['label-class']='warning';
+            status['label-title']='PAUSED';
+        }
+        else{
+            status['label-class']='success';
+            status['label-title']='PRINTING';
+        }
+
+    }
+    else {
+        if (current_layer!=-1){
+            update_layer_image(-1);
+        }
+
+        status['label-class']='danger';
+        status['label-title']='STOPPED';
+    }
+
+
+    status_template(status);
+}
+
+function request_status(){
+    var statusRequest = new XMLHttpRequest();
+    statusRequest.open('GET', "/status?time="+(new Date()).getTime(), true);
+
+    statusRequest.onreadystatechange = function() {
+        if (statusRequest.readyState == 4 && statusRequest.status == 200){
+            var response = JSON.parse(statusRequest.response);
+            visual_status_update(response);
+        }
+    }
+    statusRequest.send();
+}
+
+var status_scheduler = setInterval(request_status, 1000);

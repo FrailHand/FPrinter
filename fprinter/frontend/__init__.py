@@ -31,6 +31,7 @@ def main(global_config, **settings):
     config.add_route('home', '/')
     config.add_route('upload', '/upload')
     config.add_route('status', '/status')
+    config.add_route('layer', '/layer.png')
     config.add_route('ping', '/ping')
     config.add_route('buttons', '/button/{type}')
     config.scan('.views')

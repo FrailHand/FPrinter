@@ -26,6 +26,7 @@ function enable_upload(enable){
 }
 
 function update_status(){
+
     var httpRequest = new XMLHttpRequest();
     httpRequest.open('GET', "/status?time="+(new Date()).getTime(), true);
 
@@ -66,6 +67,7 @@ function update_status(){
                     template = Mustache.to_html(template,  {"info":"Print in progress..."});
                     document.getElementById("alert-buttons").innerHTML = template;
                 }
+
             }
 
             else{
@@ -86,7 +88,7 @@ function update_status(){
                 }
 
             }
-
+            visual_status_update(response);
         }
     }
 
@@ -222,6 +224,7 @@ document.getElementById("abort-button").onclick=function (){
     abortRequest.onreadystatechange = function() {
 
         if (abortRequest.readyState == 4 && abortRequest.status == 200){
+            var response = JSON.parse(abortRequest.response);
             if (response.valid){
                 update_status();
 
@@ -249,8 +252,6 @@ document.getElementById("abort-button").onclick=function (){
     }
 
     abortRequest.send();
-
-
 };
 
 update_status();

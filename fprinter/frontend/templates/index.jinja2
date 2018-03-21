@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="uk-container">
-    <div class="uk-tile-secondary uk-padding-large">
+    <div class="uk-tile-primary uk-padding-large">
         <div class="uk-container uk-margin-large-left">
             <h1 class="uk-heading-primary uk-margin-remove-bottom">FPrinter</h1>
             <h3 class="uk-margin-remove">Web interface</h3>
@@ -22,9 +22,24 @@
 
     <div class="uk-child-width-1-2@s uk-margin uk-grid-small uk-grid-match" uk-grid>
         <div>
-            <div class="uk-tile-primary uk-padding">
+            <div class="uk-tile uk-padding">
                 <h3 class="uk-heading-line uk-text-center"><span>Status</span></h3>
-                Printing status... ??
+                <div class="uk-margin">
+                    <img id="current-layer" src="/layer.png"/>
+                </div>
+                <div id="printing-status">
+                    Fetching printer status...
+                </div>
+                <script id="printing-status-template" type="text/template">
+                    <div class="uk-flex uk-flex-between">
+                        <div class="uk-label uk-label-{{label-class}}">{{label-title}}</div>
+
+                        <div>Layer: {{current_layer}}/{{max_layer}}</div>
+                    </div>
+                    <div class="uk-margin">
+                        <b>File:</b> {{name}}
+                    </div>
+                </script>
             </div>
         </div>
         <div>

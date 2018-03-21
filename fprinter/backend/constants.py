@@ -15,6 +15,7 @@ CONFIRMATION_MESSAGE = b'1'
 SVG_FILE = os.path.join(MAIN_DIR, 'layers.svg')
 SVG_NAME = os.path.join(MAIN_DIR, 'svg_name')
 PRINTER_STATUS = os.path.join(MAIN_DIR, 'status.dict')
+LAYER_PNG = os.path.join(MAIN_DIR, 'layer.png')
 
 UI_PING_INTERVAL = 1
 SESSION_AUTH_KEY = 'auth_ID'
