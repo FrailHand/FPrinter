@@ -18,6 +18,8 @@
         </div>
     </div>
 
+    {% raw %}
+
     <div class="uk-child-width-1-2@s uk-margin uk-grid-small uk-grid-match" uk-grid>
         <div>
             <div class="uk-tile-primary uk-padding">
@@ -30,7 +32,9 @@
                 <h3 class="uk-heading-line uk-text-center"><span>Control panel</span>
                 </h3>
 
+                {% endraw %}
                 {% if granted %}
+                {% raw %}
 
                 <div id="upload-svg"
                      class="js-upload uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-margin"
@@ -104,6 +108,7 @@
                     </button>
                 </div>
 
+                {% endraw %}
                 {% else %}
 
                 <div id="busy" class="uk-alert uk-alert-danger">Control panel busy</div>
