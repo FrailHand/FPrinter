@@ -12,8 +12,6 @@ from .constants import event, message_code
 class Server():
 
     def __init__(self, event_listener):
-        if not os.path.isdir(constants.MAIN_DIR):
-            os.mkdir(constants.MAIN_DIR)
 
         self.alive_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.alive_socket.setblocking(False)

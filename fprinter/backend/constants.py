@@ -3,6 +3,10 @@ import os
 
 # for the socket communication
 MAIN_DIR = '/tmp/fprinter'
+
+if not os.path.isdir(MAIN_DIR):
+    os.mkdir(MAIN_DIR)
+
 MAIN_SOCKET = os.path.join(MAIN_DIR, 'main_socket')
 ALIVE_SOCKET = os.path.join(MAIN_DIR, 'alive_socket')
 IDENTITY_HEADER = b'FPrinter'
