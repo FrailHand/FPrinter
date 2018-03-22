@@ -20,11 +20,27 @@ function ping_server(){
             }
         }
     }
-
     pingRequest.send();
 }
 
-var ping_scheduler =  setInterval(ping_server, 1000);
+var firstPingRequest = new XMLHttpRequest();
+firstPingRequest.open('GET', "/ping?time="+(new Date()).getTime(), true);
+
+firstPingRequest.onreadystatechange = function() {
+
+    if (firstPingRequest.readyState == 4 && firstPingRequest.status == 200){
+        var pingresponse = JSON.parse(firstPingRequest.response);
+
+        if (pingresponse.valid != authenticated){
+            location.reload(true);
+        }
+
+        else {
+            var ping_scheduler =  setInterval(ping_server, pingresponse.interval * 1000);
+        }
+    }
+}
+firstPingRequest.send();
 
 function update_layer_image(layer){
     current_layer = layer;

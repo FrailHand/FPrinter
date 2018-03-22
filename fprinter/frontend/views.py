@@ -40,10 +40,10 @@ def layer(request):
 @view_config(route_name='ping', renderer='json')
 def ping(request):
     if access_provider.allow(request.session):
-        return {'valid': True}
+        return {'valid': True, 'interval': constants.UI_PING_INTERVAL}
 
     else:
-        return {'valid': False, 'error': 'unauthorized session'}
+        return {'valid': False, 'error': 'unauthorized session', 'interval': constants.UI_PING_INTERVAL}
 
 
 @view_config(route_name='buttons', renderer='json')
