@@ -1,6 +1,7 @@
 from . import constants
 from .svg_slice_lib import parse_svg
 import json
+import queue
 
 import pyglet
 import io
@@ -10,11 +11,33 @@ import time
 import os
 from PIL import Image
 
+from . import server_unix
+from .constants import MessageCode
+from .constants import Event
+from .window import Window
+
 
 class Printer():
-    def __init__(self, window):
+    def __init__(self):
         self.reset()
-        self.window = window
+
+        self.window = Window(self.fire_event)
+        self.event_queue = queue.Queue()
+
+        try:
+            self.server = server_unix.Server(self.fire_event)
+
+        except Exception as e:
+            print('ERROR: when creating socket - {}'.format(e))
+            exit(1)
+
+        try:
+            self.server.start()
+        except Exception as e:
+            print('ERROR: when starting server - {}'.format(e))
+            exit(1)
+
+        pyglet.clock.schedule_interval(self.update, interval=1 / 60)
 
     def reset(self, purge=True):
         if purge:
@@ -117,11 +140,91 @@ class Printer():
     def end(self):
         self.window.clear()
         self.reset(purge=False)
+        # TODO end printing
 
         self.save_status()
         pass
 
-    def update(self):
+    def project_layer(self):
+        layer = self.layers[self.current_layer]
+
+        stream = io.BytesIO()
+        cairosvg.surface.PNGSurface.convert(
+            bytestring=xml.etree.ElementTree.tostring(layer),
+            write_to=stream, dpi=96, scale=1)
+        image = pyglet.image.load('', file=stream)
+        stream.close()
+
+        self.window.clear()
+        image.blit(x=(self.window.width - image.width) // 2,
+                   y=(self.window.height - image.height) // 2)
+        self.layer_timestamp = time.time()
+
+        temp_file = constants.LAYER_PNG + '~'
+
+        buffer = pyglet.image.get_buffer_manager().get_color_buffer()
+        b_image = buffer.image_data.get_image_data()
+        pil_image = Image.frombytes(b_image.format, (b_image.width, b_image.height),
+                                    b_image.get_data(b_image.format, b_image.pitch))
+        pil_image = pil_image.transpose(Image.FLIP_TOP_BOTTOM)
+        pil_image = pil_image.convert('RGB')
+        pil_image.save(temp_file, 'PNG')
+
+        os.rename(temp_file, constants.LAYER_PNG)
+
+    def shutdown(self):
+        print('INFO: shutting down printer...')
+        self.server.stop()
+        self.window.close()
+        print('INFO: display closed')
+
+    def fire_event(self, event):
+        self.event_queue.put(event)
+
+    def update(self, dt):
+
+        try:
+            while True:
+                event = self.event_queue.get(block=False)
+                if event == Event.WINDOW_CLOSE:
+                    self.shutdown()
+                    return
+
+                elif event == Event.FILE_LOADED:
+                    self.load_svg()
+                    print('INFO: layers successfully loaded')
+
+                elif event == Event.START_PRINTING:
+                    ok = self.start()
+                    if ok == 0:
+                        self.server.send(MessageCode.CONFIRM)
+                    else:
+                        self.server.send(MessageCode.REFUSE)
+
+                elif event == Event.PAUSE:
+                    ok = self.pause()
+                    if ok == 0:
+                        self.server.send(MessageCode.CONFIRM)
+                    else:
+                        self.server.send(MessageCode.REFUSE)
+
+                elif event == Event.RESUME:
+                    ok = self.resume()
+                    if ok == 0:
+                        self.server.send(MessageCode.CONFIRM)
+                    else:
+                        self.server.send(MessageCode.REFUSE)
+
+                elif event == Event.ABORT:
+                    self.abort()
+                    self.server.send(MessageCode.CONFIRM)
+
+                else:
+                    print('WARNING: unknown event - {}'.format(event))
+
+        except queue.Empty:
+            pass
+
         if self.printing_in_progress and not self.is_paused:
 
             if time.time() - self.layer_timestamp > constants.EXPOSITION_TIME:
@@ -136,30 +239,3 @@ class Printer():
                     self.project_layer()
                     self.save_status()
                     # TODO print a new layer
-
-    def project_layer(self):
-        layer = self.layers[self.current_layer]
-
-        stream = io.BytesIO()
-        cairosvg.surface.PNGSurface.convert(
-            bytestring=xml.etree.ElementTree.tostring(layer),
-            write_to=stream, dpi=96, scale=1)
-        image = pyglet.image.load('', file=stream)
-        stream.close()
-
-        self.window.clear()
-        image.blit(x=(self.window.width - image.width) // 2,
-            y=(self.window.height - image.height) // 2)
-        self.layer_timestamp = time.time()
-
-        temp_file = constants.LAYER_PNG + '~'
-
-        buffer = pyglet.image.get_buffer_manager().get_color_buffer()
-        b_image = buffer.image_data.get_image_data()
-        pil_image = Image.frombytes(b_image.format, (b_image.width, b_image.height),
-            b_image.get_data(b_image.format, b_image.pitch))
-        pil_image = pil_image.transpose(Image.FLIP_TOP_BOTTOM)
-        pil_image = pil_image.convert('RGB')
-        pil_image.save(temp_file, 'PNG')
-
-        os.rename(temp_file, constants.LAYER_PNG)

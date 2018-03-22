@@ -1,23 +1,24 @@
 import signal
+import pyglet
+from .printer import Printer
+from .constants import Event
 
 
 def main():
     '''The main routine.'''
 
-    import pyglet
-    from fprinter.backend.window import Window
-
     print('\nLaunching the FPrinter backend\n')
 
-    window = Window()
+    printer = Printer()
 
     def signal_handler(signal, frame):
-        print('\n\nKeyboard interrupt\n')
-        window.on_close()
+        print('\nINFO: Keyboard interrupt')
+        printer.fire_event(Event.WINDOW_CLOSE)
 
     signal.signal(signal.SIGINT, signal_handler)
-
     pyglet.app.run()
+
+    print('INFO: successfully terminated backend')
 
 
 if __name__ == '__main__':

@@ -45,3 +45,4 @@ class Event(Enum):
     ABORT = auto()
     PAUSE = auto()
     RESUME = auto()
+    WINDOW_CLOSE = auto()
