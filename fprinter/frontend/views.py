@@ -132,6 +132,8 @@ def upload(request):
     with open(constants.SVG_NAME, 'w') as output_file:
         output_file.write(files.filename)
 
-    backend_socket.send(constants.MessageCode.FILE_LOADED)
-
-    return {'valid': True, 'name': files.filename}
+    backend_response = backend_socket.request(constants.MessageCode.FILE_LOADED)
+    if backend_response == constants.MessageCode.CONFIRM:
+        return {'valid': True, 'name': files.filename}
+    else:
+        return {'valid': False, 'error': 'too big for printing area'}

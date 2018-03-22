@@ -1,6 +1,6 @@
 import signal
 import pyglet
-from .printer import Printer
+from .manager import Manager
 from .constants import Event
 
 
@@ -9,11 +9,11 @@ def main():
 
     print('\nLaunching the FPrinter backend\n')
 
-    printer = Printer()
+    manager = Manager()
 
     def signal_handler(signal, frame):
         print('\nINFO: Keyboard interrupt')
-        printer.fire_event((Event.EXIT,))
+        manager.fire_event((Event.EXIT,))
 
     signal.signal(signal.SIGINT, signal_handler)
     pyglet.app.run()

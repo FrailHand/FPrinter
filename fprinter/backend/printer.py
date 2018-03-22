@@ -1,47 +1,27 @@
 import os
-import time
-import queue
 import json
+import time
 
-import pyglet
 import io
 import cairosvg
 import xml
 from PIL import Image
+from .svg_slice_lib import parse_svg
+import pyglet
 
 from . import constants
-from .constants import Event
-from .constants import MessageCode
-from .window import Window
 from .drivers import HardwareDrivers
-from . import server_unix
-from .svg_slice_lib import parse_svg
 
 
 class Printer():
-    def __init__(self):
-        self.event_queue = queue.Queue()
 
-        self.window = Window(self.fire_event)
+    def __init__(self, event_handler, window):
 
-        try:
-            self.server = server_unix.Server(self.fire_event)
-
-        except Exception as e:
-            print('ERROR: when creating socket - {}'.format(e))
-            exit(1)
-
-        try:
-            self.server.start()
-        except Exception as e:
-            print('ERROR: when starting server - {}'.format(e))
-            exit(1)
-
+        self.window = window
+        self.fire_event = event_handler
         self.drivers = HardwareDrivers(self.fire_event)
 
         self.reset()
-
-        pyglet.clock.schedule_interval(self.update, interval=1 / 60)
 
     def reset(self, purge=True):
         if purge:
@@ -69,9 +49,19 @@ class Printer():
 
     def load_svg(self):
         self.layers = parse_svg(constants.SVG_FILE)
+
         with open(constants.SVG_NAME, 'r') as file:
             self.name = file.read()
+
+        printable = self.check_printable()
+
+        if not printable:
+            print('INFO: svg too big for printing area')
+            self.reset(purge=True)
+
         self.save_status()
+
+        return 0 if printable else 1
 
     def start(self):
         if len(self.layers) is 0:
@@ -84,6 +74,8 @@ class Printer():
             return 2
 
         else:
+
+
             self.printing_in_progress = True
             self.is_paused = False
             self.current_layer = -1
@@ -94,6 +86,22 @@ class Printer():
             # TODO start the printing process
 
             return 0
+
+    def check_printable(self):
+        layer = self.layers[0]
+
+        stream = io.BytesIO()
+        cairosvg.surface.PNGSurface.convert(
+            bytestring=xml.etree.ElementTree.tostring(layer),
+            write_to=stream, dpi=96, scale=1)
+        image = pyglet.image.load('', file=stream)
+        stream.close()
+
+        if image.height > self.window.height or image.width > self.window.width:
+            return False
+
+        else:
+            return True
 
     def pause(self):
         if not self.printing_in_progress:
@@ -153,6 +161,7 @@ class Printer():
         layer = self.layers[self.current_layer]
 
         stream = io.BytesIO()
+        # TODO configure dpi, scale
         cairosvg.surface.PNGSurface.convert(
             bytestring=xml.etree.ElementTree.tostring(layer),
             write_to=stream, dpi=96, scale=1)
@@ -176,59 +185,7 @@ class Printer():
 
         os.rename(temp_file, constants.LAYER_PNG)
 
-    def shutdown(self):
-        print('INFO: shutting down printer...')
-        self.server.stop()
-        self.window.close()
-        print('INFO: display closed')
-
-    def fire_event(self, event):
-        self.event_queue.put(event)
-
-    def update(self, dt):
-
-        try:
-            while True:
-                event = self.event_queue.get(block=False)
-                if event[0] == Event.EXIT:
-                    self.shutdown()
-                    return
-
-                elif event[0] == Event.FILE_UPLOADED:
-                    self.load_svg()
-                    print('INFO: layers successfully loaded')
-
-                elif event[0] == Event.START_UI:
-                    ok = self.start()
-                    if ok == 0:
-                        self.server.send(MessageCode.CONFIRM)
-                    else:
-                        self.server.send(MessageCode.REFUSE)
-
-                elif event[0] == Event.PAUSE_UI:
-                    ok = self.pause()
-                    if ok == 0:
-                        self.server.send(MessageCode.CONFIRM)
-                    else:
-                        self.server.send(MessageCode.REFUSE)
-
-                elif event[0] == Event.RESUME_UI:
-                    ok = self.resume()
-                    if ok == 0:
-                        self.server.send(MessageCode.CONFIRM)
-                    else:
-                        self.server.send(MessageCode.REFUSE)
-
-                elif event[0] == Event.ABORT_UI:
-                    self.abort()
-                    self.server.send(MessageCode.CONFIRM)
-
-                else:
-                    print('WARNING: unknown event - {}'.format(event))
-
-        except queue.Empty:
-            pass
-
+    def update(self):
         if self.printing_in_progress and not self.is_paused:
 
             if time.time() - self.layer_timestamp > constants.EXPOSITION_TIME:

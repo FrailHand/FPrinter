@@ -32,10 +32,5 @@ class Client():
 
             return self.backend_socket.recv(constants.PAYLOAD_SIZE)
 
-    def send(self, message):
-        # send a message without waiting for answer
-        # NO RESPONSE SHOULD BE SENT it could break the pipeline
-        with self.mutex:
-            self.backend_socket.send(message)
 
 
