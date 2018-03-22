@@ -7,7 +7,6 @@ import io
 import cairosvg
 import xml
 import time
-import shutil
 import os
 from PIL import Image
 

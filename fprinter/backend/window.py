@@ -5,7 +5,8 @@ from pyglet.gl import *
 
 from . import server_unix
 from .printer import Printer
-from .constants import message_code
+from .constants import MessageCode
+from .constants import Event
 
 
 class Window(pyglet.window.Window):
@@ -41,34 +42,34 @@ class Window(pyglet.window.Window):
         try:
             while True:
                 event = self.event_queue.get(block=False)
-                if event == event.FILE_LOADED:
+                if event == Event.FILE_LOADED:
                     self.printer.load_svg()
                     print('INFO: layers successfully loaded')
 
-                elif event == event.START_PRINTING:
+                elif event == Event.START_PRINTING:
                     ok = self.printer.start()
                     if ok == 0:
-                        self.server.send(message_code.CONFIRM)
+                        self.server.send(MessageCode.CONFIRM)
                     else:
-                        self.server.send(message_code.REFUSE)
+                        self.server.send(MessageCode.REFUSE)
 
-                elif event == event.PAUSE:
+                elif event == Event.PAUSE:
                     ok = self.printer.pause()
                     if ok == 0:
-                        self.server.send(message_code.CONFIRM)
+                        self.server.send(MessageCode.CONFIRM)
                     else:
-                        self.server.send(message_code.REFUSE)
+                        self.server.send(MessageCode.REFUSE)
 
-                elif event == event.RESUME:
+                elif event == Event.RESUME:
                     ok = self.printer.resume()
                     if ok == 0:
-                        self.server.send(message_code.CONFIRM)
+                        self.server.send(MessageCode.CONFIRM)
                     else:
-                        self.server.send(message_code.REFUSE)
+                        self.server.send(MessageCode.REFUSE)
 
-                elif event == event.ABORT:
+                elif event == Event.ABORT:
                     self.printer.abort()
-                    self.server.send(message_code.CONFIRM)
+                    self.server.send(MessageCode.CONFIRM)
 
                 else:
                     print('WARNING: unknown event - {}'.format(event))

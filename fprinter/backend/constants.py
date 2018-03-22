@@ -22,7 +22,7 @@ SESSION_AUTH_KEY = 'auth_ID'
 
 EXPOSITION_TIME = 0.125
 
-class message_code:
+class MessageCode:
     '''
     Message codes for the unix communication
     '''
@@ -35,7 +35,7 @@ class message_code:
     REFUSE = b'KO'
 
 
-class event(Enum):
+class Event(Enum):
     '''
     Event numbers definition for the event handlers
     '''

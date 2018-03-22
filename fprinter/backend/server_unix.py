@@ -6,7 +6,7 @@ import threading
 import queue
 
 from . import constants
-from .constants import event, message_code
+from .constants import Event, MessageCode
 
 
 class Server():
@@ -115,20 +115,20 @@ class Server():
                         received_data = connection.recv(16)
                         if received_data:
 
-                            if received_data == message_code.FILE_LOADED:
-                                self.fire_event(event.FILE_LOADED)
+                            if received_data == MessageCode.FILE_LOADED:
+                                self.fire_event(Event.FILE_LOADED)
 
-                            elif received_data == message_code.START_BUTTON:
-                                self.fire_event(event.START_PRINTING)
+                            elif received_data == MessageCode.START_BUTTON:
+                                self.fire_event(Event.START_PRINTING)
 
-                            elif received_data == message_code.PAUSE_BUTTON:
-                                self.fire_event(event.PAUSE)
+                            elif received_data == MessageCode.PAUSE_BUTTON:
+                                self.fire_event(Event.PAUSE)
 
-                            elif received_data == message_code.RESUME_BUTTON:
-                                self.fire_event(event.RESUME)
+                            elif received_data == MessageCode.RESUME_BUTTON:
+                                self.fire_event(Event.RESUME)
 
-                            elif received_data == message_code.ABORT_BUTTON:
-                                self.fire_event(event.ABORT)
+                            elif received_data == MessageCode.ABORT_BUTTON:
+                                self.fire_event(Event.ABORT)
 
                             else:
                                 print(

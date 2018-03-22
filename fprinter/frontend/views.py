@@ -54,8 +54,8 @@ def buttons(request):
     type = request.matchdict['type']
     if type == 'start':
         try:
-            backend_response = backend_socket.request(constants.message_code.START_BUTTON)
-            if backend_response == constants.message_code.CONFIRM:
+            backend_response = backend_socket.request(constants.MessageCode.START_BUTTON)
+            if backend_response == constants.MessageCode.CONFIRM:
                 return {'valid': True}
             else:
                 return {'valid': False, 'error': 'failed to start printing'}
@@ -65,8 +65,8 @@ def buttons(request):
 
     elif type == 'pause':
         try:
-            backend_response = backend_socket.request(constants.message_code.PAUSE_BUTTON)
-            if backend_response == constants.message_code.CONFIRM:
+            backend_response = backend_socket.request(constants.MessageCode.PAUSE_BUTTON)
+            if backend_response == constants.MessageCode.CONFIRM:
                 return {'valid': True}
             else:
                 return {'valid': False, 'error': 'failed to pause printing'}
@@ -76,8 +76,8 @@ def buttons(request):
 
     elif type == 'resume':
         try:
-            backend_response = backend_socket.request(constants.message_code.RESUME_BUTTON)
-            if backend_response == constants.message_code.CONFIRM:
+            backend_response = backend_socket.request(constants.MessageCode.RESUME_BUTTON)
+            if backend_response == constants.MessageCode.CONFIRM:
                 return {'valid': True}
             else:
                 return {'valid': False, 'error': 'failed to resume printing'}
@@ -87,8 +87,8 @@ def buttons(request):
 
     elif type == 'abort':
         try:
-            backend_response = backend_socket.request(constants.message_code.ABORT_BUTTON)
-            if backend_response == constants.message_code.CONFIRM:
+            backend_response = backend_socket.request(constants.MessageCode.ABORT_BUTTON)
+            if backend_response == constants.MessageCode.CONFIRM:
                 return {'valid': True}
             else:
                 return {'valid': False, 'error': 'failed to abort printing'}
@@ -132,6 +132,6 @@ def upload(request):
     with open(constants.SVG_NAME, 'w') as output_file:
         output_file.write(files.filename)
 
-    backend_socket.send(constants.message_code.FILE_LOADED)
+    backend_socket.send(constants.MessageCode.FILE_LOADED)
 
     return {'valid': True, 'name': files.filename}
