@@ -67,7 +67,6 @@ function update_status(){
                     template = Mustache.to_html(template,  {"info":"Print in progress..."});
                     document.getElementById("alert-buttons").innerHTML = template;
                 }
-
             }
 
             else{
@@ -102,7 +101,6 @@ function update_status(){
             visual_status_update(httpresponse);
         }
     }
-
     httpRequest.send();
 }
 
@@ -112,39 +110,39 @@ UIkit.upload('#upload-svg', {
     allow: '*.svg',
 
     completeAll: function (e) {
-	uploadresponse = JSON.parse(e.response);
-	
-	if (uploadresponse.valid){
-        var template = document.getElementById("file-success-template").innerHTML;
-        template = Mustache.to_html(template, uploadresponse);
-        document.getElementById("alert-upload").innerHTML = template;
+        uploadresponse = JSON.parse(e.response);
 
-        enable_button("start-button", true);
-
-    }
-	else{
-	    var template = document.getElementById("error-template").innerHTML;
-	    template = Mustache.to_html(template, uploadresponse);
+        if (uploadresponse.valid){
+            var template = document.getElementById("file-success-template").innerHTML;
+            template = Mustache.to_html(template, uploadresponse);
             document.getElementById("alert-upload").innerHTML = template;
 
-            enable_button('start-button', false);
-	}
+            enable_button("start-button", true);
+
+        }
+        else{
+            var template = document.getElementById("error-template").innerHTML;
+            template = Mustache.to_html(template, uploadresponse);
+                document.getElementById("alert-upload").innerHTML = template;
+
+                enable_button('start-button', false);
+        }
     },
 
     loadStart: function (e) {
-	bar=document.getElementById("js-progressbar");
+	    bar=document.getElementById("js-progressbar");
 
         var template = document.getElementById("progress-template").innerHTML;
         document.getElementById("alert-upload").innerHTML = template;
 
-	if (bar !== null){
-            bar.max = e.total;
-            bar.value = e.loaded;
-	}
+        if (bar !== null){
+                bar.max = e.total;
+                bar.value = e.loaded;
+        }
     },
 
     progress: function (e) {
-	bar=document.getElementById("js-progressbar");
+	    bar=document.getElementById("js-progressbar");
         bar.max = e.total;
         bar.value = e.loaded;
     },
@@ -152,7 +150,7 @@ UIkit.upload('#upload-svg', {
     fail: function () {
         enable_button('start-button', false);
 
-	alert_element = document.getElementById("alert-invalid");
+	    alert_element = document.getElementById("alert-invalid");
         if(alert_element == null){
             var template = document.getElementById("invalid-template").innerHTML;
             document.getElementById("alert-upload").innerHTML = template;
@@ -165,7 +163,7 @@ UIkit.upload('#upload-svg', {
         }
     }
 
-    });
+});
 
 document.getElementById("start-button").onclick=function (){
     enable_button("start-button", false);
@@ -222,10 +220,8 @@ document.getElementById("start-button").onclick=function (){
                 }
             }
         }
-
         pauseRequest.send();
     }
-    
 };
 
 document.getElementById("abort-button-confirmed").onclick=function (){
@@ -249,7 +245,6 @@ document.getElementById("abort-button-confirmed").onclick=function (){
 
                 enable_button("start-button", true);
             }
-
             else{
                 var template = document.getElementById("error-template").innerHTML;
                 template = Mustache.to_html(template, abortresponse);
@@ -257,11 +252,8 @@ document.getElementById("abort-button-confirmed").onclick=function (){
 
                 enable_button("start-button", true);
             }
-
-
         }
     }
-
     abortRequest.send();
 };
 
