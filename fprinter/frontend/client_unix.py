@@ -15,11 +15,11 @@ class Client():
         self.backend_socket.connect(constants.MAIN_SOCKET)
 
         # exchange identification headers
-        self.backend_socket.send(constants.IDENTITY_HEADER)
-        self.backend_socket.settimeout(5)
+        self.backend_socket.send(constants.MessageCode.IDENTITY_HEADER)
+        self.backend_socket.settimeout(constants.TIMEOUT)
         try:
-            confirmation = self.backend_socket.recv(8)
-            if not confirmation or confirmation != constants.CONFIRMATION_MESSAGE:
+            confirmation = self.backend_socket.recv(constants.PAYLOAD_SIZE)
+            if not confirmation or confirmation != constants.MessageCode.CONFIRM:
                 raise Exception('ERROR: invalid backend response')
 
         except socket.timeout:
@@ -30,7 +30,7 @@ class Client():
         with self.mutex:
             self.backend_socket.send(message)
 
-            return self.backend_socket.recv(8)
+            return self.backend_socket.recv(constants.PAYLOAD_SIZE)
 
     def send(self, message):
         # send a message without waiting for answer

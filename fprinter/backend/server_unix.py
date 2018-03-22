@@ -87,21 +87,21 @@ class Server():
                 print('INFO: Connection incoming')
 
                 # the real UI must send the identification header within 5 seconds
-                connection.settimeout(5)
+                connection.settimeout(constants.TIMEOUT)
                 try:
-                    received_data = connection.recv(8)
+                    received_data = connection.recv(constants.PAYLOAD_SIZE)
                 except socket.timeout:
                     connection.close()
                     print('WARNING: Connection timed out')
                     continue
 
-                if not received_data or received_data != constants.IDENTITY_HEADER:
+                if not received_data or received_data != MessageCode.IDENTITY_HEADER:
                     connection.close()
                     print('WARNING: Invalid header')
                     continue
 
                 print('INFO: Connection accepted!')
-                connection.send(constants.CONFIRMATION_MESSAGE)
+                connection.send(MessageCode.CONFIRM)
 
                 with self._queue.mutex:
                     self._queue.queue.clear()
@@ -112,23 +112,23 @@ class Server():
 
                     # receive incoming data
                     try:
-                        received_data = connection.recv(16)
+                        received_data = connection.recv(constants.PAYLOAD_SIZE)
                         if received_data:
 
                             if received_data == MessageCode.FILE_LOADED:
-                                self.fire_event(Event.FILE_LOADED)
+                                self.fire_event((Event.FILE_UPLOADED,))
 
                             elif received_data == MessageCode.START_BUTTON:
-                                self.fire_event(Event.START_PRINTING)
+                                self.fire_event((Event.START_UI,))
 
                             elif received_data == MessageCode.PAUSE_BUTTON:
-                                self.fire_event(Event.PAUSE)
+                                self.fire_event((Event.PAUSE_UI,))
 
                             elif received_data == MessageCode.RESUME_BUTTON:
-                                self.fire_event(Event.RESUME)
+                                self.fire_event((Event.RESUME_UI,))
 
                             elif received_data == MessageCode.ABORT_BUTTON:
-                                self.fire_event(Event.ABORT)
+                                self.fire_event((Event.ABORT_UI,))
 
                             else:
                                 print(

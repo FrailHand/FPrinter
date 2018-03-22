@@ -13,7 +13,7 @@ def main():
 
     def signal_handler(signal, frame):
         print('\nINFO: Keyboard interrupt')
-        printer.fire_event(Event.WINDOW_CLOSE)
+        printer.fire_event((Event.EXIT,))
 
     signal.signal(signal.SIGINT, signal_handler)
     pyglet.app.run()

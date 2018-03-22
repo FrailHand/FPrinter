@@ -1,28 +1,28 @@
-from . import constants
-from .svg_slice_lib import parse_svg
-import json
+import os
+import time
 import queue
+import json
 
 import pyglet
 import io
 import cairosvg
 import xml
-import time
-import os
 from PIL import Image
 
-from . import server_unix
-from .constants import MessageCode
+from . import constants
 from .constants import Event
+from .constants import MessageCode
 from .window import Window
+from .drivers import HardwareDrivers
+from . import server_unix
+from .svg_slice_lib import parse_svg
 
 
 class Printer():
     def __init__(self):
-        self.reset()
+        self.event_queue = queue.Queue()
 
         self.window = Window(self.fire_event)
-        self.event_queue = queue.Queue()
 
         try:
             self.server = server_unix.Server(self.fire_event)
@@ -36,6 +36,10 @@ class Printer():
         except Exception as e:
             print('ERROR: when starting server - {}'.format(e))
             exit(1)
+
+        self.drivers = HardwareDrivers(self.fire_event)
+
+        self.reset()
 
         pyglet.clock.schedule_interval(self.update, interval=1 / 60)
 
@@ -80,12 +84,12 @@ class Printer():
             return 2
 
         else:
-            print('INFO: starting to print - {}'.format(self.name))
             self.printing_in_progress = True
             self.is_paused = False
             self.current_layer = -1
-
             self.save_status()
+
+            print('INFO: starting to print - {}'.format(self.name))
 
             # TODO start the printing process
 
@@ -186,36 +190,36 @@ class Printer():
         try:
             while True:
                 event = self.event_queue.get(block=False)
-                if event == Event.WINDOW_CLOSE:
+                if event[0] == Event.EXIT:
                     self.shutdown()
                     return
 
-                elif event == Event.FILE_LOADED:
+                elif event[0] == Event.FILE_UPLOADED:
                     self.load_svg()
                     print('INFO: layers successfully loaded')
 
-                elif event == Event.START_PRINTING:
+                elif event[0] == Event.START_UI:
                     ok = self.start()
                     if ok == 0:
                         self.server.send(MessageCode.CONFIRM)
                     else:
                         self.server.send(MessageCode.REFUSE)
 
-                elif event == Event.PAUSE:
+                elif event[0] == Event.PAUSE_UI:
                     ok = self.pause()
                     if ok == 0:
                         self.server.send(MessageCode.CONFIRM)
                     else:
                         self.server.send(MessageCode.REFUSE)
 
-                elif event == Event.RESUME:
+                elif event[0] == Event.RESUME_UI:
                     ok = self.resume()
                     if ok == 0:
                         self.server.send(MessageCode.CONFIRM)
                     else:
                         self.server.send(MessageCode.REFUSE)
 
-                elif event == Event.ABORT:
+                elif event[0] == Event.ABORT_UI:
                     self.abort()
                     self.server.send(MessageCode.CONFIRM)
 

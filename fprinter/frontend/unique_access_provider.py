@@ -22,15 +22,15 @@ class Unique():
         return 0
 
     def allow(self, session):
-        if 'auth_ID' in session :
+        if constants.SESSION_AUTH_KEY in session :
             with self.mutex:
-                if self.authorized_ID == session['auth_ID']:
+                if self.authorized_ID == session[constants.SESSION_AUTH_KEY]:
                     self.last_ping = time.time()
                     return True
 
         ID = self.request_ID()
         if ID != 0:
-            session['auth_ID'] = ID
+            session[constants.SESSION_AUTH_KEY] = ID
             return True
 
         return False

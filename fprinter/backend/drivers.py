@@ -1,5 +1,5 @@
 from . import constants
-from .constants import event
+from .constants import Event
 
 
 class HardwareDrivers():
