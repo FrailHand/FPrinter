@@ -21,9 +21,9 @@ class Printer():
         self.fire_event = event_handler
         self.drivers = HardwareDrivers(self.fire_event)
 
-        self.reset()
+        self.reset_status(purge=True)
 
-    def reset(self, purge=True):
+    def reset_status(self, purge=True):
         if purge:
             self.layers = []
             self.name = ''
@@ -57,7 +57,7 @@ class Printer():
 
         if not printable:
             print('INFO: svg too big for printing area')
-            self.reset(purge=True)
+            self.reset_status(purge=True)
 
         self.save_status()
 
@@ -74,7 +74,6 @@ class Printer():
             return 2
 
         else:
-
 
             self.printing_in_progress = True
             self.is_paused = False
@@ -142,7 +141,7 @@ class Printer():
 
     def abort(self):
         self.window.clear()
-        self.reset()
+        self.reset_status(purge=True)
 
         self.save_status()
 
@@ -151,7 +150,7 @@ class Printer():
 
     def end(self):
         self.window.clear()
-        self.reset(purge=False)
+        self.reset_status(purge=False)
         # TODO end printing
 
         self.save_status()

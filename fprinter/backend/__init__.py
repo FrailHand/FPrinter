@@ -5,7 +5,7 @@ from .constants import Event
 
 
 def main():
-    '''The main routine.'''
+    """The main routine."""
 
     print('\nLaunching the FPrinter backend\n')
 

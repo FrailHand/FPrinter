@@ -28,9 +28,9 @@ EXPOSITION_TIME = 0.125
 
 
 class MessageCode:
-    '''
+    """
     Message codes for the unix communication
-    '''
+    """
     IDENTITY_HEADER = b'FPrinter'
 
     FILE_LOADED = b'loaded'
@@ -44,9 +44,9 @@ class MessageCode:
 
 
 class Event(Enum):
-    '''
+    """
     Event numbers definition for the event handlers
-    '''
+    """
     FILE_UPLOADED = auto()
     START_UI = auto()
     ABORT_UI = auto()
