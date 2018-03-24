@@ -34,7 +34,12 @@ class StepMotor():
 
         self.step_position = 0
 
-        # TODO J6 GPIO.pin_mode(output, motor_pins)
+        GPIO.setup(constants.Pin.MOTOR_ENABLE, GPIO.OUT)
+        GPIO.setup(constants.Pin.MOTOR_A_1, GPIO.OUT)
+        GPIO.setup(constants.Pin.MOTOR_A_2, GPIO.OUT)
+        GPIO.setup(constants.Pin.MOTOR_B_1, GPIO.OUT)
+        GPIO.setup(constants.Pin.MOTOR_B_2, GPIO.OUT)
+
         GPIO.output(constants.Pin.MOTOR_ENABLE, 1)
 
         self.thread = threading.Thread(target=self.run)

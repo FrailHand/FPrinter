@@ -12,7 +12,7 @@ class HardwareDrivers():
         :param fire_event: (function) event listener for hardware events
         """
 
-        # TODO J6 GPIO.setmode(??)
+        GPIO.setmode(GPIO.BCM)
 
         self.fire_event = event_listener
 
@@ -46,6 +46,7 @@ class HardwareDrivers():
         # speed profile
 
         step = round(dz)
+        
 
         return self.motor.move(step, speed_mode)
 
