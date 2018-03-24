@@ -12,7 +12,7 @@ import fprinter.backend.constants as constants
 
 
 def interactive_check(test, message):
-    '''Ask the user for a confirmation check by pressing enter if OK or ^C if not'''
+    """Ask the user for a confirmation check by pressing enter if OK or ^C if not"""
     answer = input('\nConfirm ([y]/n) that:\n\t{}\t'.format(message))
     print()
 

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FPrinter web interface</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/uikit/css/uikit.min.css"/>
+    <script src="/static/uikit/js/uikit.min.js"></script>
+    <script src="/static/uikit/js/uikit-icons.min.js"></script>
+    <script src="/static/mustache.min.js"></script>
+</head>
+<body>
+<div class="uk-container">
+    <div class="uk-tile-secondary uk-padding-large">
+        <div class="uk-container uk-margin-large-left">
+            <h1 class="uk-heading-primary uk-margin-remove-bottom">FPrinter</h1>
+            <h3 class="uk-margin-remove">Web interface</h3>
+        </div>
+    </div>
+
+    {% raw %}
+
+    <div class="uk-child-width-1-2@s uk-margin uk-grid-small uk-grid-match" uk-grid>
+        <div>
+            <div class="uk-tile uk-padding">
+                <h3 class="uk-heading-line uk-text-center"><span><span class="uk-margin-small-right" uk-icon="info"></span>Status</span></h3>
+                <div class="uk-margin">
+                    <img id="current-layer" src="/layer.png"/>
+                </div>
+                <div id="printing-status">
+                    Fetching printer status...
+                </div>
+                <script id="printing-status-template" type="text/template">
+                    <div class="uk-flex uk-flex-between">
+                        <div class="uk-label uk-label-{{label-class}}">{{label-title}}</div>
+
+                        <div>Layer: {{current_layer}}/{{max_layer}}</div>
+                    </div>
+                    <div class="uk-margin">
+                        <b>File:</b> {{name}}
+                    </div>
+                </script>
+            </div>
+        </div>
+        <div>
+            <div class="uk-tile uk-padding">
+                <h3 class="uk-heading-line uk-text-center">
+                {% endraw %}
+                <span><span class="uk-margin-small-right" uk-icon="{% if granted %}nut{% else %}lock{% endif %}"></span>Control panel</span>
+                </h3>
+
+                {% if granted %}
+                {% raw %}
+
+                <div id="upload-svg"
+                     class="js-upload uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-margin"
+                     uk-form-custom>
+                    <input id="input-svg" type="file">
+                    <button id="upload-button"
+                            class="uk-button uk-width-1-1 uk-button-default"
+                            type="button" tabindex="-1">
+                        upload file
+                    </button>
+                </div>
+                <div id="alert-upload">
+                    <div id="alert-initial" class="uk-alert-primary" uk-alert>
+                        <p>Select the svg slices</p>
+                    </div>
+                </div>
+                <script id="progress-template" type="text/template">
+                    <div class="uk-alert-primary" uk-alert>
+                        <progress id="js-progressbar" class="uk-progress" value="0"
+                                  max="100"></progress>
+                    </div>
+                </script>
+                <script id="invalid-template" type="text/template">
+                    <div id="alert-invalid"
+                         class="uk-alert-warning uk-animation-slide-top-small"
+                         uk-alert>
+                        <p>Please select valid .svg file</p>
+                    </div>
+                </script>
+                <script id="error-template" type="text/template">
+                    <div class="uk-alert-danger uk-animation-slide-top-small"
+                         uk-alert>
+                        <p><b>Error</b>: {{error}}</p>
+                    </div>
+                </script>
+                <script id="file-success-template" type="text/template">
+                    <div class="uk-alert-success"
+                         uk-alert>
+                        <p>File <b>{{name}}</b> successfully uploaded</p>
+                    </div>
+                </script>
+                <script id="info-template" type="text/template">
+                    <div class="uk-alert-primary"
+                         uk-alert>
+                        <p>{{info}}</p>
+                    </div>
+                </script>
+
+
+                <hr class="uk-divider-icon">
+                <div id="alert-buttons">
+                    <div class="uk-alert-primary"
+                         uk-alert>
+                        <p>Ready</p>
+                    </div>
+                </div>
+
+                <div class="uk-margin">
+                    <button id="start-button"
+                            class="uk-button uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-button-primary"
+                            disabled>
+                        start
+                    </button>
+                </div>
+
+
+                <div class="uk-margin">
+                    <button id="abort-button" uk-toggle="target: #abort-dialog" class="uk-button uk-width-1-3@l uk-width-1-2@m uk-width-2-3@s uk-button-danger" disabled>abort</button>
+                </div>
+
+                <div id="abort-dialog" uk-modal>
+                    <div class="uk-modal-dialog">
+                        <button class="uk-modal-close-default" type="button" uk-close></button>
+                        <div class="uk-modal-header">
+                            <h2 class="uk-modal-title">Abort print?</h2>
+                        </div>
+                        <div class="uk-modal-body">
+                            <p>This will stop current process and remove the uploaded file.</p>
+                            <p><b>You will lose the current piece!</b></p>
+                        </div>
+                        <div class="uk-modal-footer uk-text-right">
+                            <button class="uk-button uk-button-primary uk-modal-close">Cancel</button>
+                            <button id="abort-button-confirmed" class="uk-button uk-button-danger uk-modal-close">abort</button>
+                        </div>
+                    </div>
+                </div>
+
+
+                {% endraw %}
+                {% else %}
+
+                <div id="busy" class="uk-alert uk-alert-danger">Control panel busy</div>
+
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="/static/common.js"></script>
+
+{% if granted %}
+<script src="/static/main.js"></script>
+{% endif %}
+
+</html>
