@@ -27,6 +27,20 @@ SESSION_AUTH_KEY = 'auth_ID'
 EXPOSITION_TIME = 0.125
 
 
+class Pin():
+    # TODO J6 put the real pin numbers
+    MOTOR_ENABLE = 1
+    MOTOR_A_1 = 2
+    MOTOR_A_2 = 3
+    MOTOR_B_1 = 4
+    MOTOR_B_2 = 5
+
+class SpeedMode():
+    # TODO J6 put real delays
+    SLOW = 0.140
+    MEDIUM = 0.120
+    FAST = 0.100
+
 class MessageCode:
     """
     Message codes for the unix communication

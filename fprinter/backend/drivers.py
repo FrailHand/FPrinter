@@ -1,5 +1,6 @@
 from . import constants
 from .constants import Event
+from .steppermotor import StepMotor
 
 
 class HardwareDrivers():
@@ -11,23 +12,42 @@ class HardwareDrivers():
         :param fire_event: (function) event listener for hardware events
         """
 
+        # TODO J6 GPIO.setmode(??)
+
         self.fire_event = event_listener
 
-        print('Hardware setup')
+        self.motor = StepMotor()
+
+        print('INFO: hardware drivers initialized')
+
+    def shutdown(self):
+        """
+        Shutdown the hardware drivers and stop the threads
+
+        :return:
+        """
+        self.motor.stop()
+        print('INFO: hardware drivers successfully cleaned')
 
     def update(self):
         """Update the hardware"""
         print('Hardware updated')
 
-    def move_plate(self, dz, speed=1000):
+    def move_plate(self, dz, speed_mode=constants.SpeedMode.SLOW):
         """
         Move the printing plate upwards or downwards
 
         :param dz: (float) vertical displacement in µm
-        :param speed: (float) speed  in µm/s
-        :return: None
+        :param speed_mode: (float) step delay in s
+        :return status: (Status) command status
         """
-        print('Plate moved vertically of {} µm with speed {} µm/s'.format(dz, speed))
+
+        # TODO dz -> steps convesion
+        # speed profile
+
+        step = round(dz)
+
+        return self.motor.move(step, speed_mode)
 
     def print_LCD(self, line1=None, line2=None):
         """
