@@ -31,6 +31,10 @@ class TestHardwareDrivers(unittest.TestCase):
         self.assertIsInstance(event, tuple)
         self.assertIsInstance(event[0], constants.event)
 
+    def test_lcd(self):
+        self.hardware.print_LCD("line1","line2")
+        interactive_check(self, "line 1 and line 2 on the LCD ?")
+
 
 if __name__ == '__main__':
     print('\nRunning interactive unittest on backend\n')
