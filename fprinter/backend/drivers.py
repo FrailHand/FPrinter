@@ -1,6 +1,7 @@
 from . import constants
 from .constants import Event
 from .steppermotor import StepMotor
+from .lcd import LCD
 
 
 class HardwareDrivers():
@@ -16,7 +17,10 @@ class HardwareDrivers():
 
         self.fire_event = event_listener
 
+        self.lcd = LCD()
+
         self.motor = StepMotor()
+
 
         print('INFO: hardware drivers initialized')
 
@@ -60,8 +64,4 @@ class HardwareDrivers():
         :return: None
         """
 
-        print('Printing on LCD')
-        if line1 is not None:
-            print('Line 1: {}'.format(line1))
-        if line2 is not None:
-            print('Line2: {}'.format(line2))
+        self.lcd.print(line1,line2)
