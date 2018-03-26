@@ -1,4 +1,4 @@
-import I2C_LCD_driver
+import  i2c_lcd
 from time import *
 
 class LCD():
@@ -6,8 +6,8 @@ class LCD():
 	ERASE = "               "
 
 	def __init__(self):
-		
-		self.mylcd = I2C_LCD_driver.lcd()
+
+		self.mylcd = i2c_lcd.lcd()
 		
 
 	def print(self, l1, l2):

@@ -2,7 +2,7 @@ from . import constants
 from .constants import Event
 from .steppermotor import StepMotor
 from .lcd import LCD
-
+import RPi.GPIO as GPIO
 
 class HardwareDrivers():
 

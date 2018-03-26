@@ -5,7 +5,9 @@ requires = [
     'pyramid_jinja2',
     'waitress',
     'pyglet',
-    'cairosvg'
+    'cairosvg',
+    'RPi.GPIO',
+    'i2C_lcd',
 ]
 
 setup(
