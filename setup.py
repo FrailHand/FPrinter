@@ -6,10 +6,12 @@ requires = [
     'waitress',
     'pyglet',
     'cairosvg',
-    'RPi.GPIO',
-    'smbus-cffi',
+    'RPi.GPIO;platform_machine=="aarch64"',
+    'smbus-cffi;platform_machine=="aarch64"',
+    'fake-rpi;platform_machine=="x86_64"',
 ]
 
+    
 setup(
     name='fprinter',
     version='0.1',
