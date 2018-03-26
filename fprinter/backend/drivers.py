@@ -31,6 +31,7 @@ class HardwareDrivers():
         :return:
         """
         self.motor.stop()
+        GPIO.cleanup()  
         print('INFO: hardware drivers successfully cleaned')
 
     def update(self):
