@@ -64,4 +64,4 @@ class HardwareDrivers():
         :return: None
         """
 
-        self.lcd.print(line1,line2)
+        self.lcd.write(line1,line2)

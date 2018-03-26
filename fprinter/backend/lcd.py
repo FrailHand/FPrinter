@@ -1,5 +1,4 @@
-import  i2c_lcd
-from time import *
+from . import  i2c_lcd
 
 class LCD():
 
@@ -10,21 +9,21 @@ class LCD():
 		self.mylcd = i2c_lcd.lcd()
 		
 
-	def print(self, l1, l2):
+	def write(self, l1=None, l2=None):
 
 
 		if l1 is not None:
-			ecran.clear(1)
-			mylcd.lcd_display_string(l1, 1)
+			self.clear(1)
+			self.mylcd.lcd_display_string(l1, 1)
 
 		if l2 is not None:
-			ecran.clear(2)
-			mylcd.lcd_display_string(l2, 2)
+			self.clear(2)
+			self.mylcd.lcd_display_string(l2, 2)
 
 
 	def clear(self,line = None):
 		if line is None: 
-			mylcd.lcd_display_string(LCD.ERASE, 1)
-			mylcd.lcd_display_string(LCD.ERASE, 2)
+			self.mylcd.lcd_display_string(LCD.ERASE, 1)
+			self.mylcd.lcd_display_string(LCD.ERASE, 2)
 		else :
-			mylcd.lcd_display_string(LCD.ERASE, line)
+			self.mylcd.lcd_display_string(LCD.ERASE, line)

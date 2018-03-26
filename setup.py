@@ -7,7 +7,7 @@ requires = [
     'pyglet',
     'cairosvg',
     'RPi.GPIO',
-    'i2C_lcd',
+    'smbus-cffi',
 ]
 
 setup(

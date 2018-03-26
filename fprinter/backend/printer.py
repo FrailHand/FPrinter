@@ -23,6 +23,10 @@ class Printer():
 
         self.reset_status(purge=True)
 
+
+    def shutdown(self):
+        self.drivers.shutdown()
+
     def reset_status(self, purge=True):
         if purge:
             self.layers = []

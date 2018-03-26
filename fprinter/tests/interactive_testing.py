@@ -26,6 +26,9 @@ class TestHardwareDrivers(unittest.TestCase):
 
         self.hardware = drivers.HardwareDrivers(self.handle_event)
 
+    def tearDown(self):
+        self.hardware.shutdown()
+
     def handle_event(self, event):
         # check the event is well an event
         self.assertIsInstance(event, tuple)

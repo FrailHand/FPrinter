@@ -35,6 +35,7 @@ class Manager():
         print('INFO: shutting down printer...')
         self.server.stop()
         self.window.close()
+        self.printer.shutdown()
         print('INFO: display closed')
 
     def fire_event(self, event):
