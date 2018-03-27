@@ -1,4 +1,5 @@
 from enum import Enum, auto
+
 import os
 
 # files and sockets
@@ -21,14 +22,12 @@ TIMEOUT = 5
 
 # session authentication
 UI_PING_INTERVAL = 1
-SESSION_AUTH_KEY = 'auth_ID'
 
 # printer parameters
 EXPOSITION_TIME = 0.125
 
 
 class Pin():
-    
     MOTOR_ENABLE = 18
     MOTOR_A_1 = 4
     MOTOR_A_2 = 17
@@ -36,7 +35,6 @@ class Pin():
     MOTOR_B_2 = 24
 
 class SpeedMode():
-
     SLOW = 0.140
     MEDIUM = 0.080
     FAST = 0.040
