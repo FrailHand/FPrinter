@@ -6,8 +6,8 @@ requires = [
     'waitress',
     'pyglet',
     'cairosvg',
-    'RPi.GPIO;platform_machine=="aarch64"',
-    'smbus-cffi;platform_machine=="aarch64"',
+    'RPi.GPIO;platform_machine=="armv7l"',
+    'smbus-cffi;platform_machine=="armv7l"',
     'fake-rpi;platform_machine=="x86_64"',
 ]
 
