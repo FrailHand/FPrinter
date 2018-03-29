@@ -59,15 +59,16 @@ class Manager():
     def fire_event(self, event):
         self.event_queue.put(event)
 
-    def reset_status(self, purge=True):
+    def reset_status(self, purge=False):
         if purge:
             self.layers = []
             self.name = ''
-            self.current_layer = -1
 
+        self.current_layer = -1
         self.is_paused = False
         self.layer_timestamp = -1
         self.paused_exposition = 0
+        self.motor_status = None
 
         self.save_status()
 
@@ -188,22 +189,33 @@ class Manager():
 
             if not self.is_paused:
 
-                if time.time() - self.layer_timestamp > constants.EXPOSITION_TIME:
+                if self.motor_status is not None:
+                    if self.motor_status.done:
+                        self.project_layer()
+                        self.save_status()
+                        self.motor_status = None
+
+                    elif self.motor_status.aborted:
+                        # TODO handle error on motor
+                        pass
+
+                elif time.time() - self.layer_timestamp > constants.EXPOSITION_TIME:
 
                     self.current_layer += 1
 
                     if self.current_layer >= len(self.layers):
                         self.window.clear()
-                        self.reset_status(purge=False)
+                        if os.path.exists(constants.LAYER_PNG):
+                            os.remove(constants.LAYER_PNG)
                         # TODO end printing
 
-                        self.save_status()
                         print('INFO: print finished')
 
                     else:
-                        self.project_layer()
-                        self.save_status()
-                        # TODO print a new layer
+                        self.window.clear()
+                        # TODO fetch thickness
+                        dz = 1
+                        self.motor_status = self.drivers.move_plate(dz, speed_mode=constants.SpeedMode.SLOW)
 
     def start(self):
         if len(self.layers) is 0:
@@ -216,15 +228,9 @@ class Manager():
             return 2
 
         else:
-
-            self.is_paused = False
-            self.current_layer = -1
-            self.save_status()
-
+            self.reset_status(purge=False)
+            self.state = Manager.State.PRINTING
             print('INFO: starting to print - {}'.format(self.name))
-
-            # TODO start the printing process
-
             return 0
 
     def pause(self):
