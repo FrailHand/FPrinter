@@ -20,10 +20,10 @@ def parse_svg(file_name):
 
     for i in svg_parser.findall("{http://www.w3.org/2000/svg}g"):
         svg_slice = xml.etree.ElementTree.Element('{http://www.w3.org/2000/svg}svg')
-        svg_slice.set('height', height + 'mm')
-        svg_slice.set('width', width + 'mm')
+        svg_slice.set('height', ''.join((height, 'mm')))
+        svg_slice.set('width', ''.join((width, 'mm')))
 
-        svg_slice.set('viewBox', '0 0 ' + width + ' ' + height)
+        svg_slice.set('viewBox', ''.join(('0 0 ', width, ' ', height)))
         svg_slice.set('style', 'background-color:black;fill:white;')
         svg_slice.append(i)
 

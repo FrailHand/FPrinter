@@ -50,7 +50,7 @@ class HardwareDrivers():
         # TODO dz -> steps convesion
         # speed profile
 
-        step = round(dz)
+        step = round(dz*20)
 
         return self.motor.move(step, speed_mode)
 
