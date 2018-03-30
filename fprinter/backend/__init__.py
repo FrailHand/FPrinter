@@ -5,8 +5,9 @@ if platform.machine() == 'x86_64':
     # DEVELOPMENT PURPOSE ONLY
     import sys
     import fake_rpi
+
     sys.modules['RPi'] = fake_rpi.RPi
-    sys.modules['RPi.GPIO'] = fake_rpi.RPi.GPIO 
+    sys.modules['RPi.GPIO'] = fake_rpi.RPi.GPIO
     sys.modules['smbus'] = fake_rpi.smbus
 
 import signal

@@ -1,5 +1,7 @@
 from pyglet.gl import *
+
 from .constants import Event
+
 
 class Window(pyglet.window.Window):
 

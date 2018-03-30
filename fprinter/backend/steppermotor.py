@@ -1,8 +1,10 @@
-from . import constants
-import RPi.GPIO as GPIO
+import queue
 import threading
 import time
-import queue
+
+import RPi.GPIO as GPIO
+
+from . import constants
 
 
 class Status():
@@ -14,6 +16,13 @@ class Status():
 
     def ended(self):
         return self.done or self.aborted
+
+    def __getattribute__(self, item):
+        if item == 'condition':
+            return super().__getattribute__(item)
+        else:
+            with self.condition:
+                return super().__getattribute__(item)
 
     def __setattr__(self, key, value):
         if key == 'condition':

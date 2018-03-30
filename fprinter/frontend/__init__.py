@@ -1,7 +1,8 @@
 from pyramid.config import Configurator
+from pyramid.session import SignedCookieSessionFactory
+
 from . import client_unix
 from . import unique_access_provider
-from pyramid.session import SignedCookieSessionFactory
 
 backend_socket = client_unix.Client()
 access_provider = unique_access_provider.Unique()

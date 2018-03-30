@@ -31,6 +31,3 @@ class Client():
             self.backend_socket.send(message)
 
             return self.backend_socket.recv(constants.PAYLOAD_SIZE)
-
-
-

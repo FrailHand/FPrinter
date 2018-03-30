@@ -1,13 +1,13 @@
-from pyramid.view import view_config
-from pyramid.response import FileResponse
-from pyramid.path import AssetResolver
-import pyramid.httpexceptions as exc
-
 import os
 import shutil
 
-from . import backend_socket
+import pyramid.httpexceptions as exc
+from pyramid.path import AssetResolver
+from pyramid.response import FileResponse
+from pyramid.view import view_config
+
 from . import access_provider
+from . import backend_socket
 from ..backend import constants
 from ..backend.svg_slice_lib import check_valid_slic3r_svg
 
@@ -27,9 +27,9 @@ def home(request):
 def status(request):
     return FileResponse(constants.PRINTER_STATUS)
 
+
 @view_config(route_name='layer')
 def layer(request):
-
     if os.path.exists(constants.LAYER_PNG):
         return FileResponse(constants.LAYER_PNG)
 
@@ -43,7 +43,8 @@ def ping(request):
         return {'valid': True, 'interval': constants.UI_PING_INTERVAL}
 
     else:
-        return {'valid': False, 'error': 'unauthorized session', 'interval': constants.UI_PING_INTERVAL}
+        return {'valid': False, 'error': 'unauthorized session',
+                'interval': constants.UI_PING_INTERVAL}
 
 
 @view_config(route_name='buttons', renderer='json')
@@ -54,7 +55,8 @@ def buttons(request):
     type = request.matchdict['type']
     if type == 'start':
         try:
-            backend_response = backend_socket.request(constants.MessageCode.START_BUTTON)
+            backend_response = backend_socket.request(
+                constants.MessageCode.START_BUTTON)
             if backend_response == constants.MessageCode.CONFIRM:
                 return {'valid': True}
             else:
@@ -65,7 +67,8 @@ def buttons(request):
 
     elif type == 'pause':
         try:
-            backend_response = backend_socket.request(constants.MessageCode.PAUSE_BUTTON)
+            backend_response = backend_socket.request(
+                constants.MessageCode.PAUSE_BUTTON)
             if backend_response == constants.MessageCode.CONFIRM:
                 return {'valid': True}
             else:
@@ -76,7 +79,8 @@ def buttons(request):
 
     elif type == 'resume':
         try:
-            backend_response = backend_socket.request(constants.MessageCode.RESUME_BUTTON)
+            backend_response = backend_socket.request(
+                constants.MessageCode.RESUME_BUTTON)
             if backend_response == constants.MessageCode.CONFIRM:
                 return {'valid': True}
             else:
@@ -87,7 +91,8 @@ def buttons(request):
 
     elif type == 'abort':
         try:
-            backend_response = backend_socket.request(constants.MessageCode.ABORT_BUTTON)
+            backend_response = backend_socket.request(
+                constants.MessageCode.ABORT_BUTTON)
             if backend_response == constants.MessageCode.CONFIRM:
                 return {'valid': True}
             else:
