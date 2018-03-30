@@ -1,12 +1,12 @@
+import io
 import json
+import os
 import queue
 import time
 import xml
 from enum import Enum, auto
 
 import cairosvg
-import io
-import os
 import pyglet
 from PIL import Image
 
@@ -78,7 +78,8 @@ class Manager():
     def save_status(self):
         ready = self.state == Manager.State.READY
         in_progress = self.state == Manager.State.PRINTING or self.state == Manager.State.ENDING
-        status = {'ready': ready, 'in_progress': in_progress, 'paused': self.is_paused, 'name': self.name,
+        status = {'ready': ready, 'in_progress': in_progress,
+                  'paused': self.is_paused, 'name': self.name,
                   'current_layer': self.current_layer + 1,
                   'max_layer': len(self.layers)}
 
@@ -134,7 +135,7 @@ class Manager():
 
         self.window.clear()
         image.blit(x=(self.window.width - image.width) // 2,
-                   y=(self.window.height - image.height) // 2)
+            y=(self.window.height - image.height) // 2)
         self.layer_timestamp = time.time()
 
         temp_file = constants.LAYER_PNG + '~'
@@ -142,7 +143,7 @@ class Manager():
         buffer = pyglet.image.get_buffer_manager().get_color_buffer()
         b_image = buffer.image_data.get_image_data()
         pil_image = Image.frombytes(b_image.format, (b_image.width, b_image.height),
-                                    b_image.get_data(b_image.format, b_image.pitch))
+            b_image.get_data(b_image.format, b_image.pitch))
         pil_image = pil_image.transpose(Image.FLIP_TOP_BOTTOM)
         pil_image = pil_image.convert('RGB')
         pil_image.save(temp_file, 'PNG')
@@ -215,7 +216,8 @@ class Manager():
                         self.window.clear()
                         # TODO fetch thickness
                         dz = 1
-                        self.motor_status = self.drivers.move_plate(dz, speed_mode=constants.SpeedMode.SLOW)
+                        self.motor_status = self.drivers.move_plate(dz,
+                            speed_mode=constants.SpeedMode.SLOW)
 
     def start(self):
         if len(self.layers) is 0:

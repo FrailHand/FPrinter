@@ -1,8 +1,9 @@
-from . import constants
-from .constants import Event
-from .steppermotor import StepMotor
-from .lcd import LCD
 import RPi.GPIO as GPIO
+
+from . import constants
+from .lcd import LCD
+from .steppermotor import StepMotor
+
 
 class HardwareDrivers():
 
@@ -21,7 +22,6 @@ class HardwareDrivers():
 
         self.motor = StepMotor()
 
-
         print('INFO: hardware drivers initialized')
 
     def shutdown(self):
@@ -31,7 +31,7 @@ class HardwareDrivers():
         :return:
         """
         self.motor.stop()
-        GPIO.cleanup()  
+        GPIO.cleanup()
         print('INFO: hardware drivers successfully cleaned')
 
     def update(self):
@@ -51,7 +51,6 @@ class HardwareDrivers():
         # speed profile
 
         step = round(dz)
-        
 
         return self.motor.move(step, speed_mode)
 
@@ -65,4 +64,4 @@ class HardwareDrivers():
         :return: None
         """
 
-        self.lcd.write(line1,line2)
+        self.lcd.write(line1, line2)

@@ -1,6 +1,5 @@
-from enum import Enum, auto
-
 import os
+from enum import Enum, auto
 
 # files and sockets
 MAIN_DIR = '/tmp/fprinter'
@@ -34,10 +33,12 @@ class Pin():
     MOTOR_B_1 = 23
     MOTOR_B_2 = 24
 
+
 class SpeedMode():
     SLOW = 0.140
     MEDIUM = 0.080
     FAST = 0.040
+
 
 class MessageCode:
     """

@@ -1,9 +1,8 @@
-import socket
 import os
-import time
-
-import threading
 import queue
+import socket
+import threading
+import time
 
 from . import constants
 from .constants import Event, MessageCode

@@ -1,8 +1,10 @@
-from . import constants
-import RPi.GPIO as GPIO
+import queue
 import threading
 import time
-import queue
+
+import RPi.GPIO as GPIO
+
+from . import constants
 
 
 class Status():

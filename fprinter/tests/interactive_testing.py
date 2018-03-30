@@ -1,7 +1,6 @@
-import unittest
-
 import os
 import sys
+import unittest
 
 sys.path.append(os.path.dirname(
     os.path.dirname(
@@ -35,7 +34,7 @@ class TestHardwareDrivers(unittest.TestCase):
         self.assertIsInstance(event[0], constants.event)
 
     def test_lcd(self):
-        self.hardware.print_LCD("line1","line2")
+        self.hardware.print_LCD("line1", "line2")
         interactive_check(self, "line 1 and line 2 on the LCD ?")
 
 

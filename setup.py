@@ -10,9 +10,8 @@ requires = [
     'smbus-cffi;platform_machine=="armv7l"',
     'fake-rpi;platform_machine=="x86_64"',
     'i2c_lcd',
-]
+    ]
 
-    
 setup(
     name='fprinter',
     version='0.1',
@@ -22,20 +21,20 @@ setup(
     package_data={
         # If any package contains *.txt or *.rst files, include them:
         '': ['*.txt', '*.rst', '*.md'],
-    },
+        },
     license='MIT',
     classifiers=[
         'License :: OSI Approved :: MIT',
         'Programming Language :: Python :: 3.6',
-    ],
+        ],
     install_requires=requires,
     entry_points={
         'console_scripts': [
             'fprinter_backend = fprinter.backend:main',
-        ],
+            ],
         'paste.app_factory': [
             'main = fprinter.frontend:main',
-        ],
+            ],
 
-    },
-)
+        },
+    )
