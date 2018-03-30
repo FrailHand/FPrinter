@@ -23,7 +23,8 @@ TIMEOUT = 5
 UI_PING_INTERVAL = 1
 
 # printer parameters
-EXPOSITION_TIME = 0.125
+EXPOSITION_TIME_PER_MM = 5
+PROJECTOR_DPI = 96
 
 
 class Pin():

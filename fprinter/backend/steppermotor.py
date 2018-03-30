@@ -90,7 +90,7 @@ class StepMotor():
 
             # TODO print warning if steps == 0 ?
 
-            command[1].done = True
+            status.done = True
 
     def set_step(self, w1, w2, w3, w4):
         GPIO.output(constants.Pin.MOTOR_A_1, w1)
