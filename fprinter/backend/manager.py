@@ -21,11 +21,11 @@ from .window import Window
 
 class Manager:
     class State(Enum):
-        READY = auto()
-        PRINTING = auto()
-        ENDING = auto()
-        WAITING = auto()
-        EMERGENCY = auto()
+        READY = 'Ready'
+        PRINTING = 'Printing'
+        ENDING = 'Ending'
+        WAITING = 'Waiting'
+        EMERGENCY = 'Emergency'
 
     def __init__(self):
         self.event_queue = queue.Queue()
@@ -88,6 +88,8 @@ class Manager:
 
         with open(constants.PRINTER_STATUS, 'w') as file:
             json.dump(status, file)
+
+        self.drivers.print_LCD(line1=self.state.value)
 
     def check_printable(self):
         layer = self.layers[0]
