@@ -29,7 +29,9 @@ def parse_svg(file_name):
 
         slices_svg.append(svg_slice)
 
-    return slices_svg
+    total_height = float(slices_svg[-1].getchildren()[-1].get('{http://slic3r.org/namespaces/slic3r}z'))
+
+    return slices_svg, total_height
 
 
 def check_valid_slic3r_svg(file):

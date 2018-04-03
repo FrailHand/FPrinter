@@ -64,8 +64,10 @@ class Manager:
     def reset_status(self, purge):
         if purge:
             self.layers = []
+            self.piece_height = -1
             self.name = ''
 
+        self.printed_height = 0
         self.layer_exposition_time = 0
         self.current_layer = -1
         self.is_paused = False
@@ -79,17 +81,45 @@ class Manager:
             os.remove(constants.LAYER_PNG)
 
     def save_status(self):
-        ready = self.state == Manager.State.READY
+        ready = self.state == Manager.State.READY or self.state == Manager.State.PRINTING
         in_progress = self.state == Manager.State.PRINTING or self.state == Manager.State.ENDING
         status = {'ready': ready, 'in_progress': in_progress,
                   'paused': self.is_paused, 'name': self.name,
                   'current_layer': self.current_layer + 1,
-                  'max_layer': len(self.layers)}
+                  'max_layer': len(self.layers), 'ETA': self.ETA}
 
         with open(constants.PRINTER_STATUS, 'w') as file:
             json.dump(status, file)
 
-        self.drivers.print_LCD(line1=self.state.value)
+        if self.state == Manager.State.PRINTING:
+            if self.is_paused:
+                self.drivers.print_LCD(line1='Paused')
+            self.drivers.print_LCD(line2=self.ETA)
+        else:
+            self.drivers.print_LCD(line1=self.state.value)
+
+    @property
+    def remaining_time(self):
+        remaining_height = self.piece_height - self.printed_height
+        remaining_time = remaining_height * constants.EXPOSITION_TIME_PER_MM
+        # TODO compute motor time
+        # remaining_time += self.drivers.motor.delay(remaining_height)
+        return remaining_time
+
+    @property
+    def ETA(self):
+        if self.current_layer < 0:
+            return ''
+        remaining = round(self.remaining_time)
+        minutes = remaining // 60
+        seconds = remaining % 60
+        if minutes >= 60:
+            hours = minutes // 60
+            minutes = minutes % 60
+            ETA = '{}h {}min'.format(hours, minutes)
+        else:
+            ETA = '{}min {}s'.format(minutes, seconds)
+        return ETA
 
     def check_printable(self):
         layer = self.layers[0]
@@ -112,7 +142,7 @@ class Manager:
             print('WARNING: tried to upload file while printing')
             return 1
 
-        self.layers = parse_svg(constants.SVG_FILE)
+        self.layers, self.piece_height = parse_svg(constants.SVG_FILE)
 
         with open(constants.SVG_NAME, 'r') as file:
             self.name = file.read()
@@ -139,7 +169,7 @@ class Manager:
 
         self.window.clear()
         image.blit(x=(self.window.width - image.width) // 2,
-            y=(self.window.height - image.height) // 2)
+                   y=(self.window.height - image.height) // 2)
         self.layer_timestamp = time.time()
 
         temp_file = constants.LAYER_PNG + '~'
@@ -147,7 +177,7 @@ class Manager:
         buffer = pyglet.image.get_buffer_manager().get_color_buffer()
         b_image = buffer.image_data.get_image_data()
         pil_image = Image.frombytes(b_image.format, (b_image.width, b_image.height),
-            b_image.get_data(b_image.format, b_image.pitch))
+                                    b_image.get_data(b_image.format, b_image.pitch))
         pil_image = pil_image.transpose(Image.FLIP_TOP_BOTTOM)
         pil_image = pil_image.convert('RGB')
         pil_image.save(temp_file, 'PNG')
@@ -203,6 +233,8 @@ class Manager:
 
                 elif time.time() - self.layer_timestamp > self.layer_exposition_time:
                     self.window.clear()
+                    self.printed_height += float(self.layers[self.current_layer].getchildren()[-1].get(
+                        '{http://slic3r.org/namespaces/slic3r}layer-height'))
                     self.current_layer += 1
 
                     if self.current_layer >= len(self.layers):
@@ -219,7 +251,7 @@ class Manager:
                         self.layer_exposition_time = dz * constants.EXPOSITION_TIME_PER_MM
 
                         self.motor_status = self.drivers.move_plate(dz,
-                            speed_mode=constants.SpeedMode.SLOW)
+                                                                    speed_mode=constants.SpeedMode.SLOW)
 
         elif self.state == Manager.State.ENDING:
             # TODO move the plate to the top
