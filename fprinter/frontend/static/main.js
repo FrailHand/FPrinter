@@ -42,8 +42,14 @@ function update_status() {
                 template = Mustache.to_html(template, httpresponse);
                 document.getElementById("alert-upload").innerHTML = template;
 
-                enable_button("start-button", true);
-                enable_button("abort-button", true);
+                if (httpresponse.ready) {
+                    enable_button("start-button", true);
+                    enable_button("abort-button", true);
+                }
+                else {
+                    enable_button("start-button", false);
+                    enable_button("abort-button", false);
+                }
 
                 var pause_button = document.getElementById("start-button");
 

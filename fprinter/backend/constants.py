@@ -11,8 +11,8 @@ MAIN_SOCKET = os.path.join(MAIN_DIR, 'main_socket')
 ALIVE_SOCKET = os.path.join(MAIN_DIR, 'alive_socket')
 
 SVG_FILE = os.path.join(MAIN_DIR, 'layers.svg')
-SVG_NAME = os.path.join(MAIN_DIR, 'svg_name')
-PRINTER_STATUS = os.path.join(MAIN_DIR, 'status.dict')
+SVG_NAME = os.path.join(MAIN_DIR, 'svg_name.txt')
+PRINTER_STATUS = os.path.join(MAIN_DIR, 'status.json')
 LAYER_PNG = os.path.join(MAIN_DIR, 'layer.png')
 
 # unix socket parameters
