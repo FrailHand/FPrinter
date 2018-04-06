@@ -26,6 +26,10 @@ UI_PING_INTERVAL = 1
 EXPOSITION_TIME_PER_MM = 5
 PROJECTOR_DPI = 96
 
+# these are used to position the plate to the top, the bottom or the printing position
+PRINTER_HEIGHT = 300
+PRINTING_AREA_HEIGHT = 50
+
 
 class Pin():
     MOTOR_ENABLE = 18
