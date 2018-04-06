@@ -14,9 +14,6 @@ class Status():
         self.done = False
         self.aborted = False
 
-    def ended(self):
-        return self.done or self.aborted
-
     def __getattribute__(self, item):
         if item == 'condition':
             return super().__getattribute__(item)
@@ -36,10 +33,20 @@ class Status():
 class StepMotor():
     STEP_SEQUENCE = ((1, 0, 1, 0), (0, 1, 1, 0), (0, 1, 0, 1), (1, 0, 0, 1))
 
-    def __init__(self):
+    def __init__(self, motor_pins=(constants.Pin.MOTOR_A_1,
+                                   constants.Pin.MOTOR_A_2,
+                                   constants.Pin.MOTOR_B_1,
+                                   constants.Pin.MOTOR_B_2)):
+
+        if len(motor_pins) != 4:
+            print('ERROR: bad number of motor pins - got {}, expected 4'.format(len(motor_pins)))
+        self.motor_pins = motor_pins
 
         self.commands = queue.Queue()
         self.running = False
+
+        self.mutex = threading.Lock()
+        self.emergency = False
 
         self.step_position = 0
 
@@ -50,6 +57,7 @@ class StepMotor():
         GPIO.setup(constants.Pin.MOTOR_B_2, GPIO.OUT)
 
         GPIO.output(constants.Pin.MOTOR_ENABLE, 1)
+        self.set_step(*StepMotor.STEP_SEQUENCE[self.step_position])
 
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
@@ -57,8 +65,20 @@ class StepMotor():
     def move(self, step, delay):
 
         status = Status()
-        self.commands.put((step, delay, status))
+
+        with self.mutex:
+            emergency = self.emergency
+
+        if not emergency:
+            self.commands.put((step, delay, status))
+        else:
+            status.aborted = True
+
         return status
+
+    def set_emergency_state(self, emergency):
+        with self.mutex:
+            self.emergency = emergency
 
     def run(self):
 
@@ -80,6 +100,10 @@ class StepMotor():
                 steps = -steps
 
             for step in range(steps):
+                with self.mutex:
+                    if self.emergency:
+                        status.aborted = True
+                        break
                 # TODO check end course sensor
                 # -> status.aborted = True
                 # break
@@ -89,14 +113,14 @@ class StepMotor():
                 time.sleep(delay)
 
             # TODO print warning if steps == 0 ?
-
-            status.done = True
+            else:
+                status.done = True
 
     def set_step(self, w1, w2, w3, w4):
-        GPIO.output(constants.Pin.MOTOR_A_1, w1)
-        GPIO.output(constants.Pin.MOTOR_A_2, w2)
-        GPIO.output(constants.Pin.MOTOR_B_1, w3)
-        GPIO.output(constants.Pin.MOTOR_B_2, w4)
+        GPIO.output(self.motor_pins[0], w1)
+        GPIO.output(self.motor_pins[1], w2)
+        GPIO.output(self.motor_pins[2], w3)
+        GPIO.output(self.motor_pins[3], w4)
 
     def stop(self):
         self.running = False

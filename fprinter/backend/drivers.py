@@ -50,9 +50,12 @@ class HardwareDrivers():
         # TODO dz -> steps convesion
         # speed profile
 
-        step = round(dz*20)
+        step = round(dz * 20)
 
         return self.motor.move(step, speed_mode)
+
+    def motor_emergency(self, emergency):
+        self.motor.set_emergency_state(emergency)
 
     def print_LCD(self, line1=None, line2=None):
         """
