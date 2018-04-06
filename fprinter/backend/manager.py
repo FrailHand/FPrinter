@@ -4,7 +4,7 @@ import os
 import queue
 import time
 import xml
-from enum import Enum, auto
+from enum import Enum
 
 import cairosvg
 import pyglet
@@ -46,8 +46,9 @@ class Manager:
             print('ERROR: when starting server - {}'.format(e))
             exit(1)
 
-        self.state = Manager.State.ENDING
+        self.motor_status = None
         self.reset_status(purge=True)
+        self.set_state(Manager.State.ENDING)
 
         pyglet.clock.schedule_interval(self.update, interval=1 / 60)
 
@@ -73,9 +74,6 @@ class Manager:
         self.is_paused = False
         self.layer_timestamp = -1
         self.paused_exposition = 0
-        self.motor_status = None
-
-        self.save_status()
 
         if os.path.exists(constants.LAYER_PNG):
             os.remove(constants.LAYER_PNG)
@@ -86,7 +84,7 @@ class Manager:
         status = {'ready': ready, 'in_progress': in_progress,
                   'paused': self.is_paused, 'name': self.name,
                   'current_layer': self.current_layer + 1,
-                  'max_layer': len(self.layers), 'ETA': self.ETA}
+                  'max_layer': len(self.layers), 'ETA': self.eta}
 
         with open(constants.PRINTER_STATUS, 'w') as file:
             json.dump(status, file)
@@ -94,9 +92,19 @@ class Manager:
         if self.state == Manager.State.PRINTING:
             if self.is_paused:
                 self.drivers.print_LCD(line1='Paused')
-            self.drivers.print_LCD(line2=self.ETA)
+            self.drivers.print_LCD(line2=self.eta)
         else:
             self.drivers.print_LCD(line1=self.state.value)
+
+    def set_state(self, status):
+        if status == Manager.State.ENDING:
+            self.motor_status = self.drivers.move_plate(constants.PRINTER_HEIGHT * 2,
+                                                        speed_mode=constants.SpeedMode.FAST)
+        elif status == Manager.State.PRINTING:
+            self.reset_status(purge=False)
+
+        self.state = status
+        self.save_status()
 
     @property
     def remaining_time(self):
@@ -107,7 +115,7 @@ class Manager:
         return remaining_time
 
     @property
-    def ETA(self):
+    def eta(self):
         if self.current_layer < 0:
             return ''
         remaining = round(self.remaining_time)
@@ -116,10 +124,10 @@ class Manager:
         if minutes >= 60:
             hours = minutes // 60
             minutes = minutes % 60
-            ETA = '{}h {}min'.format(hours, minutes)
+            eta = '{}h {}min'.format(hours, minutes)
         else:
-            ETA = '{}min {}s'.format(minutes, seconds)
-        return ETA
+            eta = '{}min {}s'.format(minutes, seconds)
+        return eta
 
     def check_printable(self):
         layer = self.layers[0]
@@ -240,8 +248,8 @@ class Manager:
                     if self.current_layer >= len(self.layers):
                         if os.path.exists(constants.LAYER_PNG):
                             os.remove(constants.LAYER_PNG)
-                        self.state = Manager.State.ENDING
 
+                        self.set_state(Manager.State.ENDING)
                         print('INFO: print finished')
 
                     else:
@@ -250,22 +258,26 @@ class Manager:
                                 '{http://slic3r.org/namespaces/slic3r}layer-height'))
                         self.layer_exposition_time = dz * constants.EXPOSITION_TIME_PER_MM
 
-                        self.motor_status = self.drivers.move_plate(dz,
-                                                                    speed_mode=constants.SpeedMode.SLOW)
+                        self.motor_status = self.drivers.move_plate(dz, speed_mode=constants.SpeedMode.SLOW)
 
         elif self.state == Manager.State.ENDING:
-            # TODO move the plate to the top
-            self.motor_status = None
-            self.state = Manager.State.WAITING
-            self.save_status()
-            print('INFO: waiting for reset')
+            if self.motor_status is not None:
+                if self.motor_status.done:
+                    print('ERROR: ending step - moving printer to top gave "done" instead of "aborted"')
+                    self.emergency_stop()
+                elif self.motor_status.aborted:
+                    self.motor_status = None
+
+            else:
+                self.set_state(Manager.State.WAITING)
+                print('INFO: waiting for reset')
 
         elif self.state == Manager.State.WAITING:
             # TODO catch button reset to move the plate to the ready position
             if self.motor_status is not None:
                 if self.motor_status.done:
                     self.motor_status = None
-                    self.state = Manager.State.READY
+                    self.set_state(Manager.State.READY)
                     print('INFO: printer ready')
                 elif self.motor_status.aborted:
                     self.emergency_stop()
@@ -281,8 +293,7 @@ class Manager:
             return 2
 
         else:
-            self.state = Manager.State.PRINTING
-            self.reset_status(purge=False)
+            self.set_state(Manager.State.PRINTING)
             print('INFO: starting to print - {}'.format(self.name))
             return 0
 
@@ -324,16 +335,16 @@ class Manager:
             return 0
 
     def abort(self):
-        if self.state == Manager.State.PRINTING or self.state == Manager.State.READY:
-            self.motor_status = None
-            self.state = Manager.State.ENDING
-            self.window.clear()
         self.reset_status(purge=True)
+        if self.state == Manager.State.PRINTING or self.state == Manager.State.READY:
+            self.set_state(Manager.State.ENDING)
+            self.window.clear()
         print('INFO: aborting print')
 
     def emergency_stop(self):
-        self.motor_status = None
-        self.state = Manager.State.EMERGENCY
+        self.drivers.motor_emergency(True)
         self.window.clear()
+        self.motor_status = None
         self.reset_status(purge=True)
+        self.set_state(Manager.State.EMERGENCY)
         print('WARNING: emergency stop triggered')
