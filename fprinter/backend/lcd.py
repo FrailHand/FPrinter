@@ -5,9 +5,9 @@ class LCD():
     ERASE = "               "
     ADDRESS = 0x39
 
-    def __init__(self):
+    def __init__(self, i2c_addr=LCD.ADDRESS):
 
-        self.mylcd = i2c_lcd.lcd(addr=LCD.ADDRESS)
+        self.mylcd = i2c_lcd.lcd(addr=i2c_addr)
 
     def write(self, l1=None, l2=None):
 
