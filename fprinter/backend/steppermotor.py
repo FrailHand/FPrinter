@@ -36,11 +36,12 @@ class StepMotor():
     def __init__(self, motor_pins=(constants.Pin.MOTOR_A_1,
                                    constants.Pin.MOTOR_A_2,
                                    constants.Pin.MOTOR_B_1,
-                                   constants.Pin.MOTOR_B_2)):
+                                   constants.Pin.MOTOR_B_2), enable_pin=constants.Pin.MOTOR_ENABLE):
 
         if len(motor_pins) != 4:
             print('ERROR: bad number of motor pins - got {}, expected 4'.format(len(motor_pins)))
         self.motor_pins = motor_pins
+        self.enable_pin = enable_pin
 
         self.commands = queue.Queue()
         self.running = False
@@ -50,13 +51,13 @@ class StepMotor():
 
         self.step_position = 0
 
-        GPIO.setup(constants.Pin.MOTOR_ENABLE, GPIO.OUT)
-        GPIO.setup(constants.Pin.MOTOR_A_1, GPIO.OUT)
-        GPIO.setup(constants.Pin.MOTOR_A_2, GPIO.OUT)
-        GPIO.setup(constants.Pin.MOTOR_B_1, GPIO.OUT)
-        GPIO.setup(constants.Pin.MOTOR_B_2, GPIO.OUT)
+        GPIO.setup(self.enable_pin, GPIO.OUT)
+        GPIO.setup(self.motor_pins[0], GPIO.OUT)
+        GPIO.setup(self.motor_pins[1], GPIO.OUT)
+        GPIO.setup(self.motor_pins[2], GPIO.OUT)
+        GPIO.setup(self.motor_pins[3], GPIO.OUT)
 
-        GPIO.output(constants.Pin.MOTOR_ENABLE, 1)
+        GPIO.output(self.enable_pin, 1)
         self.set_step(*StepMotor.STEP_SEQUENCE[self.step_position])
 
         self.thread = threading.Thread(target=self.run)
