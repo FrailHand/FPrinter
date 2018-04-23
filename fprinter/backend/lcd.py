@@ -1,11 +1,13 @@
 import i2c_lcd
 
 
-class LCD():
+class LCD:
     ERASE = "               "
     ADDRESS = 0x39
 
-    def __init__(self, i2c_addr=LCD.ADDRESS):
+    def __init__(self, i2c_addr=None):
+        if i2c_addr is None:
+            i2c_addr = LCD.ADDRESS
 
         self.mylcd = i2c_lcd.lcd(addr=i2c_addr)
 

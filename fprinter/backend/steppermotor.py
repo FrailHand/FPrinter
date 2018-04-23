@@ -105,6 +105,9 @@ class StepMotor():
                     if self.emergency:
                         status.aborted = True
                         break
+                if not self.running:
+                    status.aborted = True
+                    break
                 # TODO check end course sensor
                 # -> status.aborted = True
                 # break
