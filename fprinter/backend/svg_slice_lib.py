@@ -37,7 +37,7 @@ def parse_svg(file_name):
 def check_valid_slic3r_svg(file):
     """
     Checks for valid slic3r generated svg
-    :param file_name:
+    :param file:
     :return: 0 if OK, -1 if invalid svg, -2 if valid svg but not slic3r generated
     """
 

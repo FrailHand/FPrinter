@@ -5,13 +5,13 @@ from .lcd import LCD
 from .steppermotor import StepMotor
 
 
-class HardwareDrivers():
+class HardwareDrivers:
 
     def __init__(self, event_listener):
         """
         Setup the hardware drivers
 
-        :param fire_event: (function) event listener for hardware events
+        :param event_listener: (function) event listener for hardware events
         """
 
         GPIO.setmode(GPIO.BCM)
@@ -33,10 +33,6 @@ class HardwareDrivers():
         self.motor.stop()
         GPIO.cleanup()
         print('INFO: hardware drivers successfully cleaned')
-
-    def update(self):
-        """Update the hardware"""
-        print('Hardware updated')
 
     def move_plate(self, dz, speed_mode=constants.SpeedMode.SLOW):
         """

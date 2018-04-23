@@ -8,7 +8,7 @@ from . import constants
 from .constants import Event, MessageCode
 
 
-class Server():
+class Server:
 
     def __init__(self, event_listener):
 
@@ -36,7 +36,7 @@ class Server():
                 self.alive_socket.close()
                 raise Exception('backend already running (socket in use)')
 
-            except socket.error as e:
+            except socket.error:
                 pass
 
             try:

@@ -7,7 +7,7 @@ import RPi.GPIO as GPIO
 from . import constants
 
 
-class Status():
+class Status:
     def __init__(self):
         self.condition = threading.Condition()
         self.processing = False
@@ -30,7 +30,7 @@ class Status():
                 self.condition.notify_all()
 
 
-class StepMotor():
+class StepMotor:
     STEP_SEQUENCE = ((1, 0, 1, 0), (0, 1, 1, 0), (0, 1, 0, 1), (1, 0, 0, 1))
 
     def __init__(self, motor_pins=(constants.Pin.MOTOR_A_1,

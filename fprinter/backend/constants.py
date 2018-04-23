@@ -31,7 +31,7 @@ PRINTER_HEIGHT = 300
 PRINTING_AREA_HEIGHT = 50
 
 
-class Pin():
+class Pin:
     MOTOR_ENABLE = 18
     MOTOR_A_1 = 4
     MOTOR_A_2 = 17
@@ -39,7 +39,7 @@ class Pin():
     MOTOR_B_2 = 24
 
 
-class SpeedMode():
+class SpeedMode:
     SLOW = 0.140
     MEDIUM = 0.080
     FAST = 0.040

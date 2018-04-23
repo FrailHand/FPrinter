@@ -24,11 +24,11 @@ def main():
 
     print('\nLaunching the FPrinter backend\n')
 
-    manager = Manager()
+    print_manager = Manager()
 
-    def signal_handler(signal, frame):
+    def signal_handler(signal_name, frame):
         print('\nINFO: Keyboard interrupt')
-        manager.fire_event((Event.EXIT,))
+        print_manager.fire_event((Event.EXIT,))
 
     signal.signal(signal.SIGINT, signal_handler)
     pyglet.app.run()
