@@ -2,12 +2,12 @@ import io
 import json
 import os
 import queue
-import time
 import xml
 from enum import Enum
 
 import cairosvg
 import pyglet
+import time
 from PIL import Image
 
 from . import constants
@@ -28,10 +28,25 @@ class Manager:
         EMERGENCY = 'Emergency'
 
     def __init__(self):
+        self.layers = None
+        self.piece_height = None
+        self.name = None
+        self.printed_height = None
+        self.layer_exposition_time = None
+        self.current_layer = None
+        self.is_paused = None
+        self.layer_timestamp = None
+        self.paused_exposition = None
+        self.state = None
+
         self.event_queue = queue.Queue()
 
         self.window = Window(self.fire_event)
-        self.drivers = HardwareDrivers(self.fire_event)
+
+        try:
+            self.drivers = HardwareDrivers(self.fire_event)
+        except Exception as e:
+            print('ERROR: when launching drivers - {}'.format(e))
 
         try:
             self.server = server_unix.Server(self.fire_event)
@@ -97,6 +112,9 @@ class Manager:
             self.drivers.print_LCD(line1=self.state.value)
 
     def set_state(self, status):
+        if status != Manager.State.PRINTING:
+            self.drivers.projector_auto_sleep()
+
         if status == Manager.State.ENDING:
             self.motor_status = self.drivers.move_plate(constants.PRINTER_HEIGHT * 2,
                                                         speed_mode=constants.SpeedMode.FAST)
@@ -222,6 +240,9 @@ class Manager:
                     self.abort()
                     self.server.send(MessageCode.CONFIRM)
 
+                elif event[0] == Event.PROJECTOR_ERROR:
+                    self.emergency_stop(message='projector')
+
                 else:
                     print('WARNING: unknown event - {}'.format(event))
 
@@ -229,42 +250,43 @@ class Manager:
             pass
 
         if self.state == Manager.State.PRINTING:
-            if not self.is_paused:
-                if self.motor_status is not None:
-                    if self.motor_status.done:
-                        self.project_layer()
-                        self.save_status()
-                        self.motor_status = None
+            if self.drivers.ready_projector():
+                if not self.is_paused:
+                    if self.motor_status is not None:
+                        if self.motor_status.done:
+                            self.project_layer()
+                            self.save_status()
+                            self.motor_status = None
 
-                    elif self.motor_status.aborted:
-                        self.emergency_stop()
+                        elif self.motor_status.aborted:
+                            self.emergency_stop(message='motor')
 
-                elif time.time() - self.layer_timestamp > self.layer_exposition_time:
-                    self.window.clear()
-                    self.printed_height += float(self.layers[self.current_layer].getchildren()[-1].get(
-                        '{http://slic3r.org/namespaces/slic3r}layer-height'))
-                    self.current_layer += 1
+                    elif time.time() - self.layer_timestamp > self.layer_exposition_time:
+                        self.window.clear()
+                        self.printed_height += float(self.layers[self.current_layer].getchildren()[-1].get(
+                            '{http://slic3r.org/namespaces/slic3r}layer-height'))
+                        self.current_layer += 1
 
-                    if self.current_layer >= len(self.layers):
-                        if os.path.exists(constants.LAYER_PNG):
-                            os.remove(constants.LAYER_PNG)
+                        if self.current_layer >= len(self.layers):
+                            if os.path.exists(constants.LAYER_PNG):
+                                os.remove(constants.LAYER_PNG)
 
-                        self.set_state(Manager.State.ENDING)
-                        print('INFO: print finished')
+                            self.set_state(Manager.State.ENDING)
+                            print('INFO: print finished')
 
-                    else:
-                        dz = float(
-                            self.layers[self.current_layer].getchildren()[-1].get(
-                                '{http://slic3r.org/namespaces/slic3r}layer-height'))
-                        self.layer_exposition_time = dz * constants.EXPOSITION_TIME_PER_MM
+                        else:
+                            dz = float(
+                                self.layers[self.current_layer].getchildren()[-1].get(
+                                    '{http://slic3r.org/namespaces/slic3r}layer-height'))
+                            self.layer_exposition_time = dz * constants.EXPOSITION_TIME_PER_MM
 
-                        self.motor_status = self.drivers.move_plate(dz, speed_mode=constants.SpeedMode.SLOW)
+                            self.motor_status = self.drivers.move_plate(dz, speed_mode=constants.SpeedMode.SLOW)
 
         elif self.state == Manager.State.ENDING:
             if self.motor_status is not None:
                 if self.motor_status.done:
                     print('ERROR: ending step - moving printer to top gave "done" instead of "aborted"')
-                    self.emergency_stop()
+                    self.emergency_stop(message='motor')
                 elif self.motor_status.aborted:
                     self.motor_status = None
 
@@ -280,7 +302,9 @@ class Manager:
                     self.set_state(Manager.State.READY)
                     print('INFO: printer ready')
                 elif self.motor_status.aborted:
-                    self.emergency_stop()
+                    self.emergency_stop(message='motor')
+
+        self.drivers.update()
 
     def start(self):
         if len(self.layers) == 0:
@@ -341,10 +365,12 @@ class Manager:
             self.window.clear()
         print('INFO: aborting print')
 
-    def emergency_stop(self):
+    def emergency_stop(self, message=''):
         self.drivers.motor_emergency(True)
         self.window.clear()
         self.motor_status = None
         self.reset_status(purge=True)
         self.set_state(Manager.State.EMERGENCY)
+        self.drivers.print_LCD(line2=message)
+
         print('WARNING: emergency stop triggered')

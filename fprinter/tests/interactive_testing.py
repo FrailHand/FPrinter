@@ -23,6 +23,7 @@ class TestHardwareDrivers(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def setUp(self):
         self.hardware = drivers.HardwareDrivers(self.handle_event)
 
     def tearDown(self):
@@ -30,12 +31,22 @@ class TestHardwareDrivers(unittest.TestCase):
 
     def handle_event(self, event):
         # check the event is well an event
+        print('Event received: ', event)
         self.assertIsInstance(event, tuple)
-        self.assertIsInstance(event[0], constants.event)
+        self.assertIsInstance(event[0], constants.Event)
 
     def test_lcd(self):
         self.hardware.print_LCD("line1", "line2")
         interactive_check(self, "line 1 and line 2 on the LCD ?")
+
+    def test_serial(self):
+        a = False
+        while not a:
+            a = self.hardware.ready_projector()
+            print(a)
+
+        self.hardware.serial_projector.send_command(drivers.serial_projector.Commands.POWER_ON)
+        interactive_check(self, "projector turns on ?")
 
 
 if __name__ == '__main__':

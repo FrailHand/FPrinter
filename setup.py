@@ -10,6 +10,8 @@ requires = [
     'smbus-cffi;platform_machine=="armv7l"',
     'fake-rpi;platform_machine=="x86_64"',
     'i2c_lcd',
+    'pyserial',
+    'PIL',
     ]
 
 setup(

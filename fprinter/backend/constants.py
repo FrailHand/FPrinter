@@ -27,7 +27,7 @@ EXPOSITION_TIME_PER_MM = 5
 PROJECTOR_DPI = 96
 
 # these are used to position the plate to the top, the bottom or the printing position
-PRINTER_HEIGHT = 300
+PRINTER_HEIGHT = 0.3
 PRINTING_AREA_HEIGHT = 50
 
 
@@ -71,4 +71,13 @@ class Event(Enum):
     PAUSE_UI = auto()
     RESUME_UI = auto()
 
+    PROJECTOR_ERROR = auto()
+
     EXIT = auto()
+
+
+class ProjectorStatus(Enum):
+    OFF = auto()
+    ON = auto()
+    WAITING = auto()
+    ERROR = auto()
