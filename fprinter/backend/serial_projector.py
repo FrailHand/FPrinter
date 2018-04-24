@@ -99,6 +99,16 @@ class SerialProjector:
         else:
             self.auto_sleep = False
 
+    def ready(self):
+        if self.status == constants.ProjectorStatus.ON:
+            return True
+
+        if self.status == constants.ProjectorStatus.OFF:
+            self.enable_auto_sleep(False)
+            self.send_command(Commands.POWER_ON)
+
+        return False
+
     def update(self):
         if self.auto_sleep and self.status == constants.ProjectorStatus.ON:
             if time.time() - self.sleep_time_origin > SerialProjector.AUTO_SLEEP_DELAY:

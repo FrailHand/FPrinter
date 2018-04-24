@@ -38,6 +38,9 @@ class Pin:
     MOTOR_B_1 = 23
     MOTOR_B_2 = 24
 
+    BUTTON_EMERGENCY = 5
+    BUTTON_RESET = 6
+
 
 class SpeedMode:
     SLOW = 0.140
@@ -70,6 +73,9 @@ class Event(Enum):
     ABORT_UI = auto()
     PAUSE_UI = auto()
     RESUME_UI = auto()
+
+    EMERGENCY_BTN = auto()
+    RESET_BTN = auto()
 
     PROJECTOR_ERROR = auto()
 

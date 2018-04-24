@@ -1,14 +1,14 @@
 import io
 import json
 import os
-import queue
+import time
 import xml
-from enum import Enum
 
 import cairosvg
 import pyglet
-import time
+import queue
 from PIL import Image
+from enum import Enum
 
 from . import constants
 from . import server_unix
@@ -243,6 +243,17 @@ class Manager:
                 elif event[0] == Event.PROJECTOR_ERROR:
                     self.emergency_stop(message='projector')
 
+                elif event[0] == Event.EMERGENCY_BTN:
+                    self.emergency_stop(message='button')
+
+                elif event[0] == Event.RESET_BTN:
+                    if self.state == Manager.State.WAITING:
+                        # move the plate to the bottom, then up to the printing area
+                        self.drivers.move_plate(-constants.PRINTER_HEIGHT * 2,
+                                                                    speed_mode=constants.SpeedMode.FAST)
+                        self.motor_status = self.drivers.move_plate(constants.PRINTING_AREA_HEIGHT,
+                                                                    speed_mode=constants.SpeedMode.MEDIUM)
+
                 else:
                     print('WARNING: unknown event - {}'.format(event))
 
@@ -295,7 +306,6 @@ class Manager:
                 print('INFO: waiting for reset')
 
         elif self.state == Manager.State.WAITING:
-            # TODO catch button reset to move the plate to the ready position
             if self.motor_status is not None:
                 if self.motor_status.done:
                     self.motor_status = None

@@ -3,7 +3,8 @@ import RPi.GPIO as GPIO
 from . import constants
 from .lcd import LCD
 from .steppermotor import StepMotor
-from . import serial_projector
+from .serial_projector import SerialProjector
+from .buttons import Buttons
 
 
 class HardwareDrivers:
@@ -20,10 +21,9 @@ class HardwareDrivers:
         self.fire_event = event_listener
 
         self.lcd = LCD()
-
         self.motor = StepMotor()
-
-        self.serial_projector = serial_projector.SerialProjector(self.fire_event)
+        self.serial_projector = SerialProjector(self.fire_event)
+        self.buttons = Buttons(self.fire_event)
 
         print('INFO: hardware drivers initialized')
 
@@ -74,14 +74,7 @@ class HardwareDrivers:
         self.lcd.write(line1, line2)
 
     def ready_projector(self):
-        if self.serial_projector.status == constants.ProjectorStatus.ON:
-            return True
-
-        if self.serial_projector.status == constants.ProjectorStatus.OFF:
-            self.serial_projector.enable_auto_sleep(False)
-            self.serial_projector.send_command(serial_projector.Commands.POWER_ON)
-
-        return False
+        return self.serial_projector.ready()
 
     def projector_auto_sleep(self):
         self.serial_projector.enable_auto_sleep()
