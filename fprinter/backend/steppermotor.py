@@ -31,17 +31,13 @@ class Status:
 
 
 class StepMotor:
-    STEP_SEQUENCE = ((1, 0, 1, 0), (0, 1, 1, 0), (0, 1, 0, 1), (1, 0, 0, 1))
 
-    def __init__(self, motor_pins=(constants.Pin.MOTOR_A_1,
-                                   constants.Pin.MOTOR_A_2,
-                                   constants.Pin.MOTOR_B_1,
-                                   constants.Pin.MOTOR_B_2), enable_pin=constants.Pin.MOTOR_ENABLE):
+    MOTOR_DELAY = 0.005 
 
-        if len(motor_pins) != 4:
-            print('ERROR: bad number of motor pins - got {}, expected 4'.format(len(motor_pins)))
-        self.motor_pins = motor_pins
-        self.enable_pin = enable_pin
+    def __init__(self, step_pin=constants.Pin.MOTOR_STEP, direction_pin=constants.Pin.MOTOR_DIR):
+
+        self.step_pin = step_pin
+        self.direction_pin = direction_pin
 
         self.commands = queue.Queue()
         self.running = False
@@ -51,14 +47,9 @@ class StepMotor:
 
         self.step_position = 0
 
-        GPIO.setup(self.enable_pin, GPIO.OUT)
-        GPIO.setup(self.motor_pins[0], GPIO.OUT)
-        GPIO.setup(self.motor_pins[1], GPIO.OUT)
-        GPIO.setup(self.motor_pins[2], GPIO.OUT)
-        GPIO.setup(self.motor_pins[3], GPIO.OUT)
-
-        GPIO.output(self.enable_pin, 1)
-        self.set_step(*StepMotor.STEP_SEQUENCE[self.step_position])
+        GPIO.setup(self.step_pin, GPIO.OUT)
+        GPIO.setup(self.direction_pin, GPIO.OUT)
+        GPIO.output(self.step_pin, GPIO.LOW)
 
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
@@ -95,10 +86,13 @@ class StepMotor:
             steps, delay, status = command
             status.processing = True
 
-            direction = 1
+            direction = GPIO.HIGH
             if steps < 0:
-                direction = -1
+                direction = GPIO.LOW
                 steps = -steps
+
+            GPIO.output(self.direction_pin, direction)
+            time.sleep(StepMotor.MOTOR_DELAY)
 
             for step in range(steps):
                 with self.mutex:
@@ -112,19 +106,14 @@ class StepMotor:
                 # -> status.aborted = True
                 # break
 
-                self.step_position = (self.step_position + direction) % 4
-                self.set_step(*StepMotor.STEP_SEQUENCE[self.step_position])
-                time.sleep(delay)
+                GPIO.output(self.step_pin, GPIO.HIGH)
+                sleep(StepMotor.MOTOR_DELAY)
+                GPIO.output(self.step_pin, GPIO.LOW)
+                sleep(delay)
 
             # TODO print warning if steps == 0 ?
             else:
                 status.done = True
-
-    def set_step(self, w1, w2, w3, w4):
-        GPIO.output(self.motor_pins[0], w1)
-        GPIO.output(self.motor_pins[1], w2)
-        GPIO.output(self.motor_pins[2], w3)
-        GPIO.output(self.motor_pins[3], w4)
 
     def stop(self):
         self.running = False

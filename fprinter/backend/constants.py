@@ -30,13 +30,13 @@ PROJECTOR_DPI = 96
 PRINTER_HEIGHT = 0.3
 PRINTING_AREA_HEIGHT = 50
 
+# number of step of the motor for 1 revolution
+MOTOR_STEP_PER_REVOLUTION = 200
+
 
 class Pin:
-    MOTOR_ENABLE = 18
-    MOTOR_A_1 = 4
-    MOTOR_A_2 = 17
-    MOTOR_B_1 = 23
-    MOTOR_B_2 = 24
+    MOTOR_DIR = 20
+    MOTOR_STEP = 21
 
     BUTTON_EMERGENCY = 5
     BUTTON_RESET = 6
