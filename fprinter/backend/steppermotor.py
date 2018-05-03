@@ -107,9 +107,9 @@ class StepMotor:
                 # break
 
                 GPIO.output(self.step_pin, GPIO.HIGH)
-                sleep(StepMotor.MOTOR_DELAY)
+                time.sleep(StepMotor.MOTOR_DELAY)
                 GPIO.output(self.step_pin, GPIO.LOW)
-                sleep(delay)
+                time.sleep(delay)
 
             # TODO print warning if steps == 0 ?
             else:

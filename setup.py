@@ -11,7 +11,7 @@ requires = [
     'fake-rpi;platform_machine=="x86_64"',
     'i2c_lcd',
     'pyserial',
-    'PIL',
+    'pillow',
     ]
 
 setup(
