@@ -43,9 +43,7 @@ class TestHardwareDrivers(unittest.TestCase):
         a = False
         while not a:
             a = self.hardware.ready_projector()
-            print(a)
 
-        self.hardware.serial_projector.send_command(drivers.serial_projector.Commands.POWER_ON)
         interactive_check(self, "projector turns on ?")
 
 
