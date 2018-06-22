@@ -79,6 +79,8 @@ class Event(Enum):
 
     PROJECTOR_ERROR = auto()
 
+    OVERHEAT = auto()
+
     EXIT = auto()
 
 
