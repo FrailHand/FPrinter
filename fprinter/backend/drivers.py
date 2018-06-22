@@ -5,6 +5,7 @@ from .lcd import LCD
 from .steppermotor import StepMotor
 from .serial_projector import SerialProjector
 from .buttons import Buttons
+from .temperature import Temperature
 
 
 class HardwareDrivers:
@@ -24,6 +25,10 @@ class HardwareDrivers:
         self.motor = StepMotor()
         self.serial_projector = SerialProjector(self.fire_event)
         self.buttons = Buttons(self.fire_event)
+        self.temperature_sensors = (
+            Temperature(self.fire_event, constants.Pin.TEMPERATURE_1),
+            Temperature(self.fire_event, constants.Pin.TEMPERATURE_2),
+            )
 
         print('INFO: hardware drivers initialized')
 
@@ -41,6 +46,8 @@ class HardwareDrivers:
 
     def update(self):
         self.serial_projector.update()
+        for sensor in self.temperature_sensors:
+            sensor.update()
 
     def move_plate(self, dz, speed_mode=constants.SpeedMode.SLOW):
         """

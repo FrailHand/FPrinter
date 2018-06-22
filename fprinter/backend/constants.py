@@ -33,6 +33,9 @@ PRINTING_AREA_HEIGHT = 50
 # number of step of the motor for 1 revolution
 MOTOR_STEP_PER_REVOLUTION = 200
 
+# overheat threshold temperature
+THRESHOLD_TEMPERATURE = 50
+
 
 class Pin:
     MOTOR_DIR = 20
@@ -40,6 +43,9 @@ class Pin:
 
     BUTTON_EMERGENCY = 5
     BUTTON_RESET = 6
+
+    TEMPERATURE_1 = 4
+    TEMPERATURE_2 = 7
 
 
 class SpeedMode:
@@ -80,6 +86,7 @@ class Event(Enum):
     PROJECTOR_ERROR = auto()
 
     OVERHEAT = auto()
+    TEMPERATURE_ERROR = auto()
 
     EXIT = auto()
 

@@ -1,14 +1,14 @@
 import io
 import json
 import os
+import queue
 import time
 import xml
+from enum import Enum
 
 import cairosvg
 import pyglet
-import queue
 from PIL import Image
-from enum import Enum
 
 from . import constants
 from . import server_unix
@@ -246,11 +246,17 @@ class Manager:
                 elif event[0] == Event.EMERGENCY_BTN:
                     self.emergency_stop(message='button')
 
+                elif event[0] == Event.TEMPERATURE_ERROR:
+                    self.emergency_stop(message='temp err {}'.format(event[1]))
+
+                elif event[0] == Event.OVERHEAT:
+                    self.emergency_stop(message='overheat {}'.format(event[1]))
+
                 elif event[0] == Event.RESET_BTN:
                     if self.state == Manager.State.WAITING:
                         # move the plate to the bottom, then up to the printing area
                         self.drivers.move_plate(-constants.PRINTER_HEIGHT * 2,
-                                                                    speed_mode=constants.SpeedMode.FAST)
+                                                speed_mode=constants.SpeedMode.FAST)
                         self.motor_status = self.drivers.move_plate(constants.PRINTING_AREA_HEIGHT,
                                                                     speed_mode=constants.SpeedMode.MEDIUM)
 
@@ -274,8 +280,9 @@ class Manager:
 
                     elif time.time() - self.layer_timestamp > self.layer_exposition_time:
                         self.window.clear()
-                        self.printed_height += float(self.layers[self.current_layer].getchildren()[-1].get(
-                            '{http://slic3r.org/namespaces/slic3r}layer-height'))
+                        self.printed_height += float(
+                            self.layers[self.current_layer].getchildren()[-1].get(
+                                '{http://slic3r.org/namespaces/slic3r}layer-height'))
                         self.current_layer += 1
 
                         if self.current_layer >= len(self.layers):
@@ -291,12 +298,14 @@ class Manager:
                                     '{http://slic3r.org/namespaces/slic3r}layer-height'))
                             self.layer_exposition_time = dz * constants.EXPOSITION_TIME_PER_MM
 
-                            self.motor_status = self.drivers.move_plate(dz, speed_mode=constants.SpeedMode.SLOW)
+                            self.motor_status = self.drivers.move_plate(dz,
+                                                                        speed_mode=constants.SpeedMode.SLOW)
 
         elif self.state == Manager.State.ENDING:
             if self.motor_status is not None:
                 if self.motor_status.done:
-                    print('ERROR: ending step - moving printer to top gave "done" instead of "aborted"')
+                    print('ERROR: ending step - '
+                          'moving printer to top gave "done" instead of "aborted"')
                     self.emergency_stop(message='motor')
                 elif self.motor_status.aborted:
                     self.motor_status = None
@@ -383,4 +392,4 @@ class Manager:
         self.set_state(Manager.State.EMERGENCY)
         self.drivers.print_LCD(line2=message)
 
-        print('WARNING: emergency stop triggered')
+        print('WARNING: emergency stop triggered - {}'.format(message))
