@@ -1,10 +1,9 @@
 import RPi.GPIO as GPIO
 
 from . import constants
+from .buttons import Buttons
 from .lcd import LCD
 from .steppermotor import StepMotor
-from .serial_projector import SerialProjector
-from .buttons import Buttons
 from .temperature import Temperature
 
 
@@ -23,7 +22,7 @@ class HardwareDrivers:
 
         self.lcd = LCD()
         self.motor = StepMotor()
-        self.serial_projector = SerialProjector(self.fire_event)
+        # self.serial_projector = SerialProjector(self.fire_event)
         self.buttons = Buttons(self.fire_event)
         self.temperature_sensors = (
             Temperature(self.fire_event, constants.Pin.TEMPERATURE_1),
@@ -39,13 +38,13 @@ class HardwareDrivers:
         :return:
         """
         self.motor.stop()
-        self.serial_projector.shutdown()
+        # self.serial_projector.shutdown()
 
         GPIO.cleanup()
         print('INFO: hardware drivers successfully cleaned')
 
     def update(self):
-        self.serial_projector.update()
+        # self.serial_projector.update()
         for sensor in self.temperature_sensors:
             sensor.update()
 
@@ -53,7 +52,7 @@ class HardwareDrivers:
         """
         Move the printing plate upwards or downwards
 
-        :param dz: (float) vertical displacement in µm
+        :param dz: (float) vertical displacement in mm
         :param speed_mode: (float) step delay in s
         :return status: (Status) command status
         """
@@ -81,7 +80,9 @@ class HardwareDrivers:
         self.lcd.write(line1, line2)
 
     def ready_projector(self):
-        return self.serial_projector.ready()
+        return True
+        # return self.serial_projector.ready()
 
     def projector_auto_sleep(self):
-        self.serial_projector.enable_auto_sleep()
+        pass
+        # self.serial_projector.enable_auto_sleep()
