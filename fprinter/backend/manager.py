@@ -55,7 +55,8 @@ class Manager:
 
         except Exception as e:
             print('ERROR: when creating socket - {}'.format(e))
-            self.shutdown(cleanup=False)
+            self.window.close()
+            self.drivers.shutdown()
             exit(1)
 
         try:

@@ -17,16 +17,21 @@ class HardwareDrivers:
         :param event_listener: (function) event listener for hardware events
         """
 
+        print('gpio')
         GPIO.setmode(GPIO.BCM)
 
         self.fire_event = event_listener
 
+        print('security')
         self.security = Security(constants.Pin.RELAYS)
         self.security.enable()
 
+        print('lcd')
         self.lcd = LCD()
+        print('motor')
         self.motor = StepMotor()
         # self.serial_projector = SerialProjector(self.fire_event)
+        print('buttons')
         self.buttons = Buttons(self.fire_event)
         self.temperature_sensors = (
             Temperature(self.fire_event, constants.Pin.TEMPERATURE_1),
