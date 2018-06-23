@@ -43,6 +43,7 @@ class Pin:
 
     BUTTON_EMERGENCY = 5
     BUTTON_RESET = 6
+    BUTTON_SHUTDOWN = 3
 
     TEMPERATURE_1 = 4
     TEMPERATURE_2 = 7
@@ -87,6 +88,7 @@ class Event(Enum):
 
     EMERGENCY_BTN = auto()
     RESET_BTN = auto()
+    SHUTDOWN_BTN = auto()
 
     PROJECTOR_ERROR = auto()
 

@@ -262,6 +262,10 @@ class Manager:
                         self.motor_status = self.drivers.move_plate(constants.PRINTING_AREA_HEIGHT,
                                                                     speed_mode=constants.SpeedMode.MEDIUM)
 
+                elif event[0] == Event.SHUTDOWN_BTN:
+                    # TODO shutdown procedure
+                    print('STOP')
+
                 else:
                     print('WARNING: unknown event - {}'.format(event))
 
