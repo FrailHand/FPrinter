@@ -17,21 +17,17 @@ class HardwareDrivers:
         :param event_listener: (function) event listener for hardware events
         """
 
-        print('gpio')
         GPIO.setmode(GPIO.BCM)
 
         self.fire_event = event_listener
 
-        print('security')
         self.security = Security(constants.Pin.RELAYS)
         self.security.enable()
 
-        print('lcd')
-        self.lcd = LCD()
-        print('motor')
+        # TODO remove
+        # self.lcd = LCD()
         self.motor = StepMotor()
         # self.serial_projector = SerialProjector(self.fire_event)
-        print('buttons')
         self.buttons = Buttons(self.fire_event)
         self.temperature_sensors = (
             Temperature(self.fire_event, constants.Pin.TEMPERATURE_1),
@@ -86,8 +82,10 @@ class HardwareDrivers:
         :param line2: (str) message for second line
         :return: None
         """
-
-        self.lcd.write(line1, line2)
+        # TODO remove debug
+        print(line1)
+        print(line2)
+        # self.lcd.write(line1, line2)
 
     def ready_projector(self):
         return True
