@@ -47,6 +47,8 @@ class Manager:
             self.drivers = HardwareDrivers(self.fire_event)
         except Exception as e:
             print('ERROR: when launching drivers - {}'.format(e))
+            self.shutdown(cleanup=False)
+            exit(1)
 
         try:
             self.server = server_unix.Server(self.fire_event)
