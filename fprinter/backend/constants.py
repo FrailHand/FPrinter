@@ -40,6 +40,10 @@ THRESHOLD_TEMPERATURE = 50
 class Pin:
     MOTOR_DIR = 20
     MOTOR_STEP = 21
+    MOTOR_END_COURSE = (
+        10,
+        11,
+        )
 
     BUTTON_EMERGENCY = 5
     BUTTON_RESET = 6

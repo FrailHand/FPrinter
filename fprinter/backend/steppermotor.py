@@ -31,13 +31,15 @@ class Status:
 
 
 class StepMotor:
+    MOTOR_DELAY = 0.005
+    END_COURSE_PRESSED = GPIO.HIGH
 
-    MOTOR_DELAY = 0.005 
-
-    def __init__(self, step_pin=constants.Pin.MOTOR_STEP, direction_pin=constants.Pin.MOTOR_DIR):
+    def __init__(self, step_pin=constants.Pin.MOTOR_STEP, direction_pin=constants.Pin.MOTOR_DIR,
+                 end_course_pins=constants.Pin.MOTOR_END_COURSE):
 
         self.step_pin = step_pin
         self.direction_pin = direction_pin
+        self.end_course_sensors = end_course_pins
 
         self.commands = queue.Queue()
         self.running = False
@@ -50,6 +52,9 @@ class StepMotor:
         GPIO.setup(self.step_pin, GPIO.OUT)
         GPIO.setup(self.direction_pin, GPIO.OUT)
         GPIO.output(self.step_pin, GPIO.LOW)
+
+        for pin in self.end_course_sensors:
+            GPIO.setup(pin, GPIO.IN)
 
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
@@ -102,9 +107,15 @@ class StepMotor:
                 if not self.running:
                     status.aborted = True
                     break
-                # TODO check end course sensor
-                # -> status.aborted = True
-                # break
+
+                end_course = False
+                for pin in self.end_course_sensors:
+                    if GPIO.input(pin) == StepMotor.END_COURSE_PRESSED:
+                        end_course=True
+                        break
+                if end_course:
+                    status.aborted = True
+                    break
 
                 GPIO.output(self.step_pin, GPIO.HIGH)
                 time.sleep(StepMotor.MOTOR_DELAY)
