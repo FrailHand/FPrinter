@@ -53,12 +53,14 @@ class Manager:
 
         except Exception as e:
             print('ERROR: when creating socket - {}'.format(e))
+            self.shutdown(cleanup=False)
             exit(1)
 
         try:
             self.server.start()
         except Exception as e:
             print('ERROR: when starting server - {}'.format(e))
+            self.shutdown(cleanup=False)
             exit(1)
 
         self.motor_status = None
@@ -67,9 +69,9 @@ class Manager:
 
         pyglet.clock.schedule_interval(self.update, interval=1 / 60)
 
-    def shutdown(self):
+    def shutdown(self, cleanup=True):
         print('INFO: shutting down printer...')
-        self.server.stop()
+        self.server.stop(cleanup)
         self.window.close()
         self.drivers.shutdown()
         print('INFO: display closed')

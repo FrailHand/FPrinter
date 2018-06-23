@@ -23,6 +23,9 @@ class Server:
 
         self.fire_event = event_listener
 
+        self.alive_thread = None
+        self.accept_thread = None
+
     def send(self, message):
         self._queue.put(message, block=False)
 
@@ -158,19 +161,22 @@ class Server:
 
         self.server_socket.close()
 
-    def stop(self):
+    def stop(self, cleanup=True):
         self.running = False
-        self.alive_thread.join()
-        self.accept_thread.join()
+        if self.alive_thread is not None:
+            self.alive_thread.join()
+        if self.accept_thread is not None:
+            self.accept_thread.join()
 
-        try:
-            os.unlink(constants.ALIVE_SOCKET)
-        except OSError as e:
-            print('ERROR: unlink socket - {}'.format(e))
+        if cleanup:
+            try:
+                os.unlink(constants.ALIVE_SOCKET)
+            except OSError as e:
+                print('ERROR: unlink socket - {}'.format(e))
 
-        try:
-            os.unlink(constants.MAIN_SOCKET)
-        except OSError as e:
-            print('ERROR: unlink socket - {}'.format(e))
+            try:
+                os.unlink(constants.MAIN_SOCKET)
+            except OSError as e:
+                print('ERROR: unlink socket - {}'.format(e))
 
-        print('INFO: Sockets correctly cleaned')
+            print('INFO: Sockets correctly cleaned')
