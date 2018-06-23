@@ -3,7 +3,7 @@ def main():
 
     import platform
 
-    FULLSCREEN = True
+    fullscreen = True
     if platform.machine() == 'x86_64':
         # this allows to run the code on non-raspberry machines
         # DEVELOPMENT PURPOSE ONLY
@@ -18,7 +18,7 @@ def main():
         sys.modules['serial'] = fake_rpi_serial
         sys.modules['Adafruit_DHT'] = fake_adafruit_dht
 
-        FULLSCREEN = False
+        fullscreen = False
 
     import signal
     import pyglet
@@ -27,7 +27,7 @@ def main():
 
     print('\nLaunching the FPrinter backend\n')
 
-    print_manager = Manager()
+    print_manager = Manager(fullscreen=fullscreen)
 
     def signal_handler(signal_name, frame):
         print('\nINFO: Keyboard interrupt')

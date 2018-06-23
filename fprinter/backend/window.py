@@ -1,13 +1,12 @@
 from pyglet.gl import *
 
 from fprinter.backend.constants import Event
-from fprinter.backend import FULLSCREEN
 
 
 class Window(pyglet.window.Window):
 
-    def __init__(self, event_listener):
-        super().__init__(caption='FPrinter', resizable=False, fullscreen=FULLSCREEN)
+    def __init__(self, event_listener, fullscreen=True):
+        super().__init__(caption='FPrinter', resizable=False, fullscreen=fullscreen)
 
         self.set_mouse_visible(False)
         self.fire_event = event_listener

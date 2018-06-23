@@ -27,7 +27,7 @@ class Manager:
         WAITING = 'Waiting'
         EMERGENCY = 'Emergency'
 
-    def __init__(self):
+    def __init__(self, fullscreen=True):
         self.layers = None
         self.piece_height = None
         self.name = None
@@ -41,7 +41,7 @@ class Manager:
 
         self.event_queue = queue.Queue()
 
-        self.window = Window(self.fire_event)
+        self.window = Window(self.fire_event, fullscreen=fullscreen)
 
         try:
             self.drivers = HardwareDrivers(self.fire_event)
