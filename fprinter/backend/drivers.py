@@ -3,6 +3,7 @@ import RPi.GPIO as GPIO
 from fprinter.backend import constants
 from fprinter.backend.buttons import Buttons
 from fprinter.backend.lcd import LCD
+from fprinter.backend.security import Security
 from fprinter.backend.steppermotor import StepMotor
 from fprinter.backend.temperature import Temperature
 
@@ -19,6 +20,9 @@ class HardwareDrivers:
         GPIO.setmode(GPIO.BCM)
 
         self.fire_event = event_listener
+
+        self.security = Security(constants.Pin.RELAYS)
+        self.security.enable()
 
         self.lcd = LCD()
         self.motor = StepMotor()
@@ -39,6 +43,7 @@ class HardwareDrivers:
         """
         self.motor.stop()
         # self.serial_projector.shutdown()
+        self.security.disable()
 
         GPIO.cleanup()
         print('INFO: hardware drivers successfully cleaned')

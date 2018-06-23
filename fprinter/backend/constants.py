@@ -47,6 +47,11 @@ class Pin:
     TEMPERATURE_1 = 4
     TEMPERATURE_2 = 7
 
+    RELAYS = (
+        1,
+        2,
+        )
+
 
 class SpeedMode:
     SLOW = 0.140

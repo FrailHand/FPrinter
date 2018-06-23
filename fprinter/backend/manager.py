@@ -384,12 +384,16 @@ class Manager:
             self.window.clear()
         print('INFO: aborting print')
 
-    def emergency_stop(self, message=''):
+    def emergency_stop(self, message='', hardware=False):
+        if hardware:
+            self.drivers.security.disable()
+            print('WARNING: relays disabled')
+
         self.drivers.motor_emergency(True)
         self.window.clear()
         self.motor_status = None
         self.reset_status(purge=True)
         self.set_state(Manager.State.EMERGENCY)
         self.drivers.print_LCD(line2=message)
-
+        # TODO how do we leave emergency state?
         print('WARNING: emergency stop triggered - {}'.format(message))
