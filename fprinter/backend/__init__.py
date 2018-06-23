@@ -19,8 +19,8 @@ if platform.machine() == 'x86_64':
 
 import signal
 import pyglet
-from .manager import Manager
-from .constants import Event
+from fprinter.backend.manager import Manager
+from fprinter.backend.constants import Event
 
 
 def main():

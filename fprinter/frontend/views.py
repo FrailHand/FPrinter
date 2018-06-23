@@ -6,10 +6,10 @@ from pyramid.path import AssetResolver
 from pyramid.response import FileResponse
 from pyramid.view import view_config
 
-from . import access_provider
-from . import backend_socket
-from ..backend import constants
-from ..backend.svg_slice_lib import check_valid_slic3r_svg
+from fprinter.frontend import access_provider
+from fprinter.frontend import backend_socket
+from fprinter.backend import constants
+from fprinter.backend.svg_slice_lib import check_valid_slic3r_svg
 
 templates_path = AssetResolver('fprinter.frontend').resolve('templates').abspath()
 

@@ -2,7 +2,7 @@ import random
 import threading
 import time
 
-from ..backend import constants
+from fprinter.backend import constants
 
 
 class Unique():

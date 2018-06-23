@@ -4,7 +4,7 @@ import time
 
 import RPi.GPIO as GPIO
 
-from . import constants
+from fprinter.backend import constants
 
 
 class Status:

@@ -4,8 +4,8 @@ import socket
 import threading
 import time
 
-from . import constants
-from .constants import Event, MessageCode
+from fprinter.backend import constants
+from fprinter.backend.constants import Event, MessageCode
 
 
 class Server:

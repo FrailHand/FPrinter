@@ -1,6 +1,6 @@
 import Adafruit_DHT
 
-from . import constants
+from fprinter.backend import constants
 
 
 class Temperature:

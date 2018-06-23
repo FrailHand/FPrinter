@@ -1,7 +1,7 @@
 from pyglet.gl import *
 
-from .constants import Event
-from . import FULLSCREEN
+from fprinter.backend.constants import Event
+from fprinter.backend import FULLSCREEN
 
 
 class Window(pyglet.window.Window):

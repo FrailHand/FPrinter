@@ -1,7 +1,7 @@
 import socket
 import threading
 
-from ..backend import constants
+from fprinter.backend import constants
 
 
 class Client():

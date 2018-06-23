@@ -10,13 +10,13 @@ import cairosvg
 import pyglet
 from PIL import Image
 
-from . import constants
-from . import server_unix
-from .constants import Event
-from .constants import MessageCode
-from .drivers import HardwareDrivers
-from .svg_slice_lib import parse_svg
-from .window import Window
+from fprinter.backend import constants
+from fprinter.backend import server_unix
+from fprinter.backend.constants import Event
+from fprinter.backend.constants import MessageCode
+from fprinter.backend.drivers import HardwareDrivers
+from fprinter.backend.svg_slice_lib import parse_svg
+from fprinter.backend.window import Window
 
 
 class Manager:

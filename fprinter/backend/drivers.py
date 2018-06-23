@@ -1,10 +1,10 @@
 import RPi.GPIO as GPIO
 
-from . import constants
-from .buttons import Buttons
-from .lcd import LCD
-from .steppermotor import StepMotor
-from .temperature import Temperature
+from fprinter.backend import constants
+from fprinter.backend.buttons import Buttons
+from fprinter.backend.lcd import LCD
+from fprinter.backend.steppermotor import StepMotor
+from fprinter.backend.temperature import Temperature
 
 
 class HardwareDrivers:
