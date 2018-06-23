@@ -12,7 +12,6 @@ requires = [
     'i2c_lcd',
     'pyserial',
     'pillow',
-    'Adafruit_Python_DHT;platform_machine=="armv7l"',
     ]
 
 setup(
