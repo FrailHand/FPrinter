@@ -34,12 +34,16 @@ class StepMotor:
     MOTOR_DELAY = 0.005
     END_COURSE_PRESSED = GPIO.HIGH
 
-    def __init__(self, step_pin=constants.Pin.MOTOR_STEP, direction_pin=constants.Pin.MOTOR_DIR,
-                 end_course_pins=constants.Pin.MOTOR_END_COURSE):
+    def __init__(self,
+                 step_pin=constants.Pin.MOTOR_STEP,
+                 direction_pin=constants.Pin.MOTOR_DIR,
+                 end_course_top=constants.Pin.MOTOR_END_COURSE_TOP,
+                 end_course_bottom=constants.Pin.MOTOR_END_COURSE_TOP):
 
         self.step_pin = step_pin
         self.direction_pin = direction_pin
-        self.end_course_sensors = end_course_pins
+        self.end_course_top = end_course_top
+        self.end_course_bottom = end_course_bottom
 
         self.commands = queue.Queue()
         self.running = False
@@ -53,8 +57,8 @@ class StepMotor:
         GPIO.setup(self.direction_pin, GPIO.OUT)
         GPIO.output(self.step_pin, GPIO.LOW)
 
-        for pin in self.end_course_sensors:
-            GPIO.setup(pin, GPIO.IN)
+        GPIO.setup(self.end_course_top, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.end_course_bottom, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
@@ -109,11 +113,21 @@ class StepMotor:
                     break
 
                 end_course = False
-                for pin in self.end_course_sensors:
-                    if GPIO.input(pin) == StepMotor.END_COURSE_PRESSED:
-                        end_course=True
-                        break
+
+                if GPIO.input(self.end_course_top) == StepMotor.END_COURSE_PRESSED:
+                    end_course = True
+                    GPIO.output(self.direction_pin, GPIO.LOW)
+
+                elif GPIO.input(self.end_course_bottom) == StepMotor.END_COURSE_PRESSED:
+                    end_course = True
+                    GPIO.output(self.direction_pin, GPIO.HIGH)
+
                 if end_course:
+                    for _ in range(constants.END_COURSE_STEPS):
+                        GPIO.output(self.step_pin, GPIO.HIGH)
+                        time.sleep(StepMotor.MOTOR_DELAY)
+                        GPIO.output(self.step_pin, GPIO.LOW)
+                        time.sleep(delay)
                     status.aborted = True
                     break
 

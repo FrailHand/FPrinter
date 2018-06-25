@@ -29,6 +29,7 @@ PROJECTOR_DPI = 96
 # these are used to position the plate to the top, the bottom or the printing position
 PRINTER_HEIGHT = 0.3
 PRINTING_AREA_HEIGHT = 50
+END_COURSE_STEPS = 10
 
 # number of step of the motor for 1 revolution
 MOTOR_STEP_PER_REVOLUTION = 200
@@ -40,21 +41,19 @@ THRESHOLD_TEMPERATURE = 50
 class Pin:
     MOTOR_DIR = 20
     MOTOR_STEP = 21
-    MOTOR_END_COURSE = (
-        10,
-        11,
-        )
+    MOTOR_END_COURSE_TOP = 23
+    MOTOR_END_COURSE_BOTTOM = 24
 
-    BUTTON_EMERGENCY = 5
-    BUTTON_RESET = 6
-    BUTTON_SHUTDOWN = 3
+    BUTTON_EMERGENCY = 27
+    BUTTON_RESET = 17
+    BUTTON_SHUTDOWN = 22
 
-    TEMPERATURE_1 = 4
-    TEMPERATURE_2 = 7
+    TEMPERATURE_1 = 19
+    TEMPERATURE_2 = 26
 
     RELAYS = (
-        1,
-        2,
+        5,
+        6,
         )
 
 

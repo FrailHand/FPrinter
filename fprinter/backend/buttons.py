@@ -13,9 +13,9 @@ class Buttons:
         self.fire_event = event_handler
 
         # TODO pull up or down?
-        GPIO.setup(reset_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(emergency_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(shutdown_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(reset_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(emergency_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(shutdown_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
         # TODO rising or falling?
         GPIO.add_event_detect(reset_pin, GPIO.RISING, callback=self.reset_pressed, bouncetime=Buttons.DEBOUNCE_DELAY)
