@@ -46,6 +46,12 @@ class TestHardwareDrivers(unittest.TestCase):
 
         interactive_check(self, "projector turns on ?")
 
+    def test_motor(self):
+        self.hardware.move_plate(10)
+        interactive_check(self, "plate moves up 10mm ?")
+        self.hardware.move_plate(-10)
+        interactive_check(self, "plate moves down 10mm ?")
+
 
 if __name__ == '__main__':
     print('\nRunning interactive unittest on backend\n')
