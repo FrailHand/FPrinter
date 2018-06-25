@@ -38,7 +38,7 @@ class StepMotor:
                  step_pin=constants.Pin.MOTOR_STEP,
                  direction_pin=constants.Pin.MOTOR_DIR,
                  end_course_top=constants.Pin.MOTOR_END_COURSE_TOP,
-                 end_course_bottom=constants.Pin.MOTOR_END_COURSE_TOP):
+                 end_course_bottom=constants.Pin.MOTOR_END_COURSE_BOTTOM):
 
         self.step_pin = step_pin
         self.direction_pin = direction_pin
