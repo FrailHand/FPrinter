@@ -55,6 +55,12 @@ class TestHardwareDrivers(unittest.TestCase):
         self.hardware.print_LCD("line1", "line2")
         interactive_check(self, "line 1 and line 2 on the LCD ?")
 
+    def test_relay(self):
+        self.hardware.security.disable()
+        interactive_check(self, "relays are disconnected ?")
+        self.hardware.security.enable()
+        interactive_check(self, "relays are connected ?")
+
     def test_serial(self):
         a = False
         while not a:
