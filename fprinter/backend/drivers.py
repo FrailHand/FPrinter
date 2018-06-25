@@ -24,8 +24,7 @@ class HardwareDrivers:
         self.security = Security(constants.Pin.RELAYS)
         self.security.enable()
 
-        # TODO remove
-        # self.lcd = LCD()
+        self.lcd = LCD()
         self.motor = StepMotor()
         # self.serial_projector = SerialProjector(self.fire_event)
         self.buttons = Buttons(self.fire_event)
@@ -82,10 +81,7 @@ class HardwareDrivers:
         :param line2: (str) message for second line
         :return: None
         """
-        # TODO remove debug
-        print(line1)
-        print(line2)
-        # self.lcd.write(line1, line2)
+        self.lcd.write(line1, line2)
 
     def ready_projector(self):
         return True
