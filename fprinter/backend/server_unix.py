@@ -1,3 +1,4 @@
+import logging
 import os
 import queue
 import socket
@@ -32,7 +33,7 @@ class Server:
     def start(self):
 
         if os.path.exists(constants.ALIVE_SOCKET):
-            print('WARNING: alive socket exists - checking status ...')
+            logging.warning('alive socket exists - checking status ...')
             # check if the server is already running
             try:
                 self.alive_socket.connect(constants.ALIVE_SOCKET)
@@ -48,7 +49,7 @@ class Server:
                 raise Exception('unlink socket - {}'.format(e))
 
         if os.path.exists(constants.MAIN_SOCKET):
-            print('WARNING: server socket exists - deleting')
+            logging.warning('server socket exists - deleting')
             try:
                 os.unlink(constants.MAIN_SOCKET)
             except OSError as e:
@@ -73,7 +74,7 @@ class Server:
             try:
                 connection, client = self.alive_socket.accept()
                 connection.close()
-                print('INFO: Alive socket triggered')
+                logging.info('alive socket triggered')
 
             except BlockingIOError:
                 time.sleep(1)
@@ -86,7 +87,7 @@ class Server:
         while self.running:
             try:
                 connection, client = self.server_socket.accept()
-                print('INFO: Connection incoming')
+                logging.info('connection incoming')
 
                 # the real UI must send the identification header within 5 seconds
                 connection.settimeout(constants.TIMEOUT)
@@ -94,15 +95,15 @@ class Server:
                     received_data = connection.recv(constants.PAYLOAD_SIZE)
                 except socket.timeout:
                     connection.close()
-                    print('WARNING: Connection timed out')
+                    logging.warning('connection timed out')
                     continue
 
                 if not received_data or received_data != MessageCode.IDENTITY_HEADER:
                     connection.close()
-                    print('WARNING: Invalid header')
+                    logging.warning('invalid header')
                     continue
 
-                print('INFO: Connection accepted!')
+                logging.info('connection accepted!')
                 connection.send(MessageCode.CONFIRM)
 
                 with self._queue.mutex:
@@ -133,8 +134,8 @@ class Server:
                                 self.fire_event((Event.ABORT_UI,))
 
                             else:
-                                print(
-                                    'WARNING: unknown message on unix socket - {}'.format(
+                                logging.warning(
+                                    'unknown message on unix socket - {}'.format(
                                         received_data))
 
                         else:
@@ -172,11 +173,11 @@ class Server:
             try:
                 os.unlink(constants.ALIVE_SOCKET)
             except OSError as e:
-                print('ERROR: unlink socket - {}'.format(e))
+                logging.error('unlink socket - {}'.format(e))
 
             try:
                 os.unlink(constants.MAIN_SOCKET)
             except OSError as e:
-                print('ERROR: unlink socket - {}'.format(e))
+                logging.error('unlink socket - {}'.format(e))
 
-            print('INFO: Sockets correctly cleaned')
+            logging.info('sockets correctly cleaned')

@@ -2,6 +2,8 @@ def main():
     """The main routine."""
 
     import platform
+    import logging
+
 
     fullscreen = True
     if platform.machine() == 'x86_64':
@@ -20,27 +22,36 @@ def main():
 
         fullscreen = False
 
+        logging.basicConfig(format='%(levelname)s:%(module)s.%(funcName)s:%(message)s',
+                            level=logging.DEBUG)
+        logging.warning('using fake RPi interfaces')
+
+    else:
+        logging.basicConfig(filename='/tmp/fprinter_backend.log',
+                            format='%(levelname)s:%(module)s.%(funcName)s:%(message)s',
+                            level=logging.DEBUG)
+
     import signal
     import pyglet
     from fprinter.backend.manager import Manager
     from fprinter.backend.constants import Event
     from subprocess import call
 
-    print('\nLaunching the FPrinter backend\n')
+    logging.info('launching the FPrinter backend')
 
     print_manager = Manager(fullscreen=fullscreen)
 
     def signal_handler(signal_name, frame):
-        print('\nINFO: Keyboard interrupt')
+        logging.info('keyboard interrupt')
         print_manager.fire_event((Event.EXIT,))
 
     signal.signal(signal.SIGINT, signal_handler)
     pyglet.app.run()
 
-    print('INFO: successfully terminated backend')
+    logging.info('successfully terminated backend')
 
     if print_manager.system_halt:
-        print('INFO: shutting down system')
+        logging.info('shutting down system')
         call('sudo halt', shell=True)
 
 

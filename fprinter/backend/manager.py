@@ -1,14 +1,15 @@
-import io
-import json
-import os
-import queue
 import time
-import xml
-from enum import Enum
 
 import cairosvg
+import io
+import json
+import logging
+import os
 import pyglet
+import queue
+import xml
 from PIL import Image
+from enum import Enum
 
 from fprinter.backend import constants
 from fprinter.backend import server_unix
@@ -48,7 +49,7 @@ class Manager:
         try:
             self.drivers = HardwareDrivers(self.fire_event)
         except Exception as e:
-            print('ERROR: when launching drivers - {}'.format(e))
+            logging.error('when launching drivers - {}'.format(e))
             self.shutdown(cleanup=False)
             exit(1)
 
@@ -56,7 +57,7 @@ class Manager:
             self.server = server_unix.Server(self.fire_event)
 
         except Exception as e:
-            print('ERROR: when creating socket - {}'.format(e))
+            logging.error('when creating socket - {}'.format(e))
             self.window.close()
             self.drivers.shutdown()
             exit(1)
@@ -64,7 +65,7 @@ class Manager:
         try:
             self.server.start()
         except Exception as e:
-            print('ERROR: when starting server - {}'.format(e))
+            logging.error('when starting server - {}'.format(e))
             self.shutdown(cleanup=False)
             exit(1)
 
@@ -75,12 +76,12 @@ class Manager:
         pyglet.clock.schedule_interval(self.update, interval=1 / 60)
 
     def shutdown(self, cleanup=True):
-        print('INFO: shutting down printer...')
+        logging.info('shutting down printer...')
         self.drivers.print_LCD('SHUTDOWN', '...')
         self.server.stop(cleanup)
         self.window.close()
         self.drivers.shutdown()
-        print('INFO: display closed')
+        logging.info('display closed')
 
     def fire_event(self, event):
         self.event_queue.put(event)
@@ -173,7 +174,7 @@ class Manager:
 
     def load_svg(self):
         if self.state != Manager.State.READY and self.state != Manager.State.WAITING:
-            print('WARNING: tried to upload file while printing')
+            logging.warning('tried to upload file while printing')
             return 1
 
         self.layers, self.piece_height = parse_svg(constants.SVG_FILE)
@@ -184,7 +185,7 @@ class Manager:
         printable = self.check_printable()
 
         if not printable:
-            print('INFO: svg too big for printing area')
+            logging.info('svg too big for printing area')
             self.reset_status(purge=True)
 
         self.save_status()
@@ -278,7 +279,7 @@ class Manager:
                         self.shutdown_timestamp = timestamp
 
                 else:
-                    print('WARNING: unknown event - {}'.format(event))
+                    logging.warning('unknown event - {}'.format(event))
 
         except queue.Empty:
             pass
@@ -307,7 +308,7 @@ class Manager:
                                 os.remove(constants.LAYER_PNG)
 
                             self.set_state(Manager.State.ENDING)
-                            print('INFO: print finished')
+                            logging.info('print finished')
 
                         else:
                             dz = float(
@@ -321,22 +322,22 @@ class Manager:
         elif self.state == Manager.State.ENDING:
             if self.motor_status is not None:
                 if self.motor_status.done:
-                    print('ERROR: ending step - '
-                          'moving printer to top gave "done" instead of "aborted"')
+                    logging.error('ending step - '
+                                  'moving printer to top gave "done" instead of "aborted"')
                     self.emergency_stop(message='motor')
                 elif self.motor_status.aborted:
                     self.motor_status = None
 
             else:
                 self.set_state(Manager.State.WAITING)
-                print('INFO: waiting for reset')
+                logging.info('waiting for reset')
 
         elif self.state == Manager.State.WAITING:
             if self.motor_status is not None:
                 if self.motor_status.done:
                     self.motor_status = None
                     self.set_state(Manager.State.READY)
-                    print('INFO: printer ready')
+                    logging.info('printer ready')
                 elif self.motor_status.aborted:
                     self.emergency_stop(message='motor')
 
@@ -345,25 +346,25 @@ class Manager:
     def start(self):
         if len(self.layers) == 0:
             # return error code if the layers are not loaded
-            print('WARNING: tried to start printing with no layers loaded')
+            logging.warning('tried to start printing with no layers loaded')
             return 1
 
         elif self.state != Manager.State.READY:
-            print('WARNING: tried to start printing while not ready')
+            logging.warning('tried to start printing while not ready')
             return 2
 
         else:
             self.set_state(Manager.State.PRINTING)
-            print('INFO: starting to print - {}'.format(self.name))
+            logging.info('starting to print - {}'.format(self.name))
             return 0
 
     def pause(self):
         if self.state != Manager.State.PRINTING:
-            print('WARNING: tried to pause while not printing')
+            logging.warning('tried to pause while not printing')
             return 1
 
         elif self.is_paused:
-            print('WARNING: tried to pause while already paused')
+            logging.warning('tried to pause while already paused')
             return 2
 
         else:
@@ -373,16 +374,16 @@ class Manager:
             self.save_status()
             self.paused_exposition = timestamp - self.layer_timestamp
 
-            print('INFO: print paused')
+            logging.info('print paused')
             return 0
 
     def resume(self):
         if self.state != Manager.State.PRINTING:
-            print('WARNING: tried to resume while not printing')
+            logging.warning('tried to resume while not printing')
             return 1
 
         elif not self.is_paused:
-            print('WARNING: tried to resume while already running')
+            logging.warning('tried to resume while already running')
             return 2
 
         else:
@@ -391,7 +392,7 @@ class Manager:
             self.project_layer()
             self.layer_timestamp -= self.paused_exposition
 
-            print('INFO: print resumed')
+            logging.info('print resumed')
             return 0
 
     def abort(self):
@@ -399,12 +400,12 @@ class Manager:
         if self.state == Manager.State.PRINTING or self.state == Manager.State.READY:
             self.set_state(Manager.State.ENDING)
             self.window.clear()
-        print('INFO: aborting print')
+            logging.info('aborting print')
 
     def emergency_stop(self, message='', hardware=False):
         if hardware:
             self.drivers.security.disable()
-            print('WARNING: relays disabled')
+            logging.warning('relays disabled')
 
         self.drivers.motor_emergency(True)
         self.window.clear()
@@ -413,4 +414,4 @@ class Manager:
         self.set_state(Manager.State.EMERGENCY)
         self.drivers.print_LCD(line2=message)
         # TODO how do we leave emergency state?
-        print('WARNING: emergency stop triggered - {}'.format(message))
+        logging.warning('emergency stop triggered - {}'.format(message))

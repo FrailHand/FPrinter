@@ -1,8 +1,8 @@
 import RPi.GPIO as GPIO
+import logging
 
 from fprinter.backend import constants
 from fprinter.backend.buttons import Buttons
-from fprinter.backend.lcd import LCD
 from fprinter.backend.security import Security
 from fprinter.backend.steppermotor import StepMotor
 from fprinter.backend.temperature import Temperature
@@ -32,9 +32,9 @@ class HardwareDrivers:
         self.temperature_sensors = (
             Temperature(self.fire_event, constants.Pin.TEMPERATURE_1),
             Temperature(self.fire_event, constants.Pin.TEMPERATURE_2),
-            )
+        )
 
-        print('INFO: hardware drivers initialized')
+        logging.info('hardware drivers initialized')
 
     def shutdown(self):
         """
@@ -47,7 +47,7 @@ class HardwareDrivers:
         self.security.disable()
 
         GPIO.cleanup()
-        print('INFO: hardware drivers successfully cleaned')
+        logging.info('hardware drivers successfully cleaned')
 
     def update(self):
         # self.serial_projector.update()
@@ -82,8 +82,9 @@ class HardwareDrivers:
         :param line2: (str) message for second line
         :return: None
         """
-        #TODO LCD
+        # TODO LCD
         # self.lcd.write(line1, line2)
+        logging.warning('LCD disabled, debug mode')
         print(line1)
         print(line2)
 

@@ -1,3 +1,4 @@
+import logging
 import threading
 
 import serial
@@ -112,7 +113,7 @@ class SerialProjector:
     def update(self):
         if self.auto_sleep and self.status == constants.ProjectorStatus.ON:
             if time.time() - self.sleep_time_origin > SerialProjector.AUTO_SLEEP_DELAY:
-                print('INFO: projector goes to sleep')
+                logging.info('projector goes to sleep')
                 self.send_command(Commands.POWER_OFF)
 
     def shutdown(self):

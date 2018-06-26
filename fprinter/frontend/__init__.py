@@ -1,3 +1,4 @@
+import logging
 from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
 
@@ -9,16 +10,20 @@ access_provider = unique_access_provider.Unique()
 
 
 def main(global_config, **settings):
-    print('\nLaunching the FPrinter frontend\n')
+    logging.basicConfig(filename='/tmp/fprinter_frontend.log',
+                        format='%(levelname)s:%(module)s.%(funcName)s:%(message)s',
+                        level=logging.DEBUG)
 
-    print('Connecting to backend...')
+    logging.info('launching the FPrinter frontend')
+
+    logging.info('connecting to backend...')
     try:
         backend_socket.connect()
     except Exception as e:
-        print('ERROR: connecting to backend socket - {}'.format(e))
+        logging.error('connecting to backend socket - {}'.format(e))
         exit(1)
 
-    print('Success\n')
+    logging.info('success')
 
     config = Configurator(settings=settings)
 

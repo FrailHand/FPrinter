@@ -1,3 +1,4 @@
+import logging
 import xml.etree.ElementTree
 
 
@@ -5,12 +6,12 @@ def parse_svg(file_name):
     try:
         svg_parser = xml.etree.ElementTree.ElementTree(file=file_name)
     except xml.etree.ElementTree.ParseError:
-        print('ERROR: invalid svg syntax')
+        logging.error('invalid svg syntax')
         return
 
     if svg_parser.findall("{http://www.w3.org/2000/svg}g")[0].get(
             '{http://slic3r.org/namespaces/slic3r}z') is None:
-        print('ERROR: svg is not slic3r generated')
+        logging.error('svg is not slic3r generated')
         return
 
     slices_svg = []
