@@ -63,12 +63,16 @@ class HardwareDrivers:
         :return status: (Status) command status
         """
 
-        # TODO dz -> steps convesion
-        # speed profile
-
-        step = round(dz * 20)
-
+        step = self.length_to_motor_steps(dz)
         return self.motor.move(step, speed_mode)
+
+    def length_to_motor_steps(self, dz):
+        # TODO dz -> steps convesion
+        return round(dz * 20)
+
+    def compute_motor_time(self, dz, speed_mode=constants.SpeedMode.SLOW):
+        steps = abs(self.length_to_motor_steps(dz))
+        return self.motor.total_delay(steps, speed_mode)
 
     def motor_emergency(self, emergency):
         self.motor.set_emergency_state(emergency)

@@ -1,8 +1,8 @@
-import queue
-import threading
 import time
 
 import RPi.GPIO as GPIO
+import queue
+import threading
 
 from fprinter.backend import constants
 
@@ -136,7 +136,6 @@ class StepMotor:
                 GPIO.output(self.step_pin, GPIO.LOW)
                 time.sleep(delay)
 
-            # TODO print warning if steps == 0 ?
             else:
                 status.done = True
 
@@ -144,3 +143,7 @@ class StepMotor:
         self.running = False
         self.commands.put(None)
         self.thread.join()
+
+    @staticmethod
+    def total_delay(steps, delay):
+        return (2 * steps + 1) * delay

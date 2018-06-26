@@ -137,8 +137,8 @@ class Manager:
     def remaining_time(self):
         remaining_height = self.piece_height - self.printed_height
         remaining_time = remaining_height * constants.EXPOSITION_TIME_PER_MM
-        # TODO compute motor time
-        # remaining_time += self.drivers.motor.delay(remaining_height)
+        remaining_time += self.drivers.compute_motor_time(remaining_height,
+                                                          speed_mode=constants.SpeedMode.SLOW)
         return remaining_time
 
     @property
@@ -262,12 +262,16 @@ class Manager:
                     self.emergency_stop(message='overheat {}'.format(event[1]))
 
                 elif event[0] == Event.RESET_BTN:
-                    if self.state == Manager.State.WAITING:
+                    if self.state == Manager.State.WAITING and self.motor_status is None:
                         # move the plate to the bottom, then up to the printing area
                         self.drivers.move_plate(-constants.PRINTER_HEIGHT * 2,
                                                 speed_mode=constants.SpeedMode.FAST)
                         self.motor_status = self.drivers.move_plate(constants.PRINTING_AREA_HEIGHT,
                                                                     speed_mode=constants.SpeedMode.MEDIUM)
+                    elif self.state == Manager.State.EMERGENCY:
+                        self.set_state(Manager.State.ENDING)
+                    else:
+                        logging.warning('reset button pressed with no action')
 
                 elif event[0] == Event.SHUTDOWN_BTN:
                     timestamp = time.time()
@@ -405,7 +409,7 @@ class Manager:
     def emergency_stop(self, message='', hardware=False):
         if hardware:
             self.drivers.security.disable()
-            logging.warning('relays disabled')
+            logging.warning('relays disabled, please restart the printer')
 
         self.drivers.motor_emergency(True)
         self.window.clear()
@@ -413,5 +417,4 @@ class Manager:
         self.reset_status(purge=True)
         self.set_state(Manager.State.EMERGENCY)
         self.drivers.print_LCD(line2=message)
-        # TODO how do we leave emergency state?
         logging.warning('emergency stop triggered - {}'.format(message))
