@@ -15,3 +15,4 @@ class Temperature:
             self.fire_event((constants.Event.TEMPERATURE_ERROR, self.pin))
         elif temperature > constants.THRESHOLD_TEMPERATURE:
             self.fire_event((constants.Event.OVERHEAT, self.pin))
+        return temperature

@@ -52,27 +52,38 @@ class TestHardwareDrivers(unittest.TestCase):
         self.assertIsInstance(event[0], constants.Event)
 
     def test_lcd(self):
-        self.hardware.print_LCD("line1", "line2")
-        interactive_check(self, "line 1 and line 2 on the LCD ?")
+        self.hardware.print_LCD("first", "second")
+        interactive_check(self, "'first' and 'second' are printed the LCD")
+        self.hardware.print_LCD("third")
+        interactive_check(self, "'third' and 'second' are printed the LCD")
 
     def test_relay(self):
         self.hardware.security.disable()
-        interactive_check(self, "relays are disconnected ?")
+        interactive_check(self, "relays are disconnected")
         self.hardware.security.enable()
-        interactive_check(self, "relays are connected ?")
+        interactive_check(self, "relays are connected")
 
-    def test_serial(self):
-        a = False
-        while not a:
-            a = self.hardware.ready_projector()
+    # def test_serial(self):
+    #     a = False
+    #     while not a:
+    #         a = self.hardware.ready_projector()
+    #
+    #     interactive_check(self, "projector turns on")
 
-        interactive_check(self, "projector turns on ?")
+    def test_buttons(self):
+        interactive_check(self, "when you press buttons, events are printed")
 
     def test_motor(self):
-        self.hardware.move_plate(10)
-        interactive_check(self, "plate moves up 10mm ?")
-        self.hardware.move_plate(-10)
-        interactive_check(self, "plate moves down 10mm ?")
+        self.hardware.move_plate(10, constants.SpeedMode.FAST)
+        interactive_check(self, "plate moves up 10mm")
+        self.hardware.move_plate(-10, constants.SpeedMode.FAST)
+        interactive_check(self, "plate moves down 10mm")
+
+    def test_temperature(self):
+        temp = self.hardware.temperature_sensors[0].update()
+        interactive_check(self, "temperature is {}°C (sensor 1)".format(temp))
+        temp = self.hardware.temperature_sensors[1].update()
+        interactive_check(self, "temperature is {}°C (sensor 2)".format(temp))
 
 
 if __name__ == '__main__':
