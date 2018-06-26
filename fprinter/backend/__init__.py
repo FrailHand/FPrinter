@@ -24,6 +24,7 @@ def main():
     import pyglet
     from fprinter.backend.manager import Manager
     from fprinter.backend.constants import Event
+    from subprocess import call
 
     print('\nLaunching the FPrinter backend\n')
 
@@ -37,6 +38,10 @@ def main():
     pyglet.app.run()
 
     print('INFO: successfully terminated backend')
+
+    if print_manager.system_halt:
+        print('INFO: shutting down system')
+        call('sudo halt', shell=True)
 
 
 if __name__ == '__main__':

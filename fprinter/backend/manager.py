@@ -38,6 +38,8 @@ class Manager:
         self.layer_timestamp = None
         self.paused_exposition = None
         self.state = None
+        self.shutdown_timestamp = 0
+        self.system_halt = False
 
         self.event_queue = queue.Queue()
 
@@ -74,6 +76,7 @@ class Manager:
 
     def shutdown(self, cleanup=True):
         print('INFO: shutting down printer...')
+        self.drivers.print_LCD('SHUTDOWN', '...')
         self.server.stop(cleanup)
         self.window.close()
         self.drivers.shutdown()
@@ -266,8 +269,13 @@ class Manager:
                                                                     speed_mode=constants.SpeedMode.MEDIUM)
 
                 elif event[0] == Event.SHUTDOWN_BTN:
-                    # TODO shutdown procedure
-                    print('STOP')
+                    timestamp = time.time()
+                    if timestamp - self.shutdown_timestamp < constants.SHUTDOWN_DELAY:
+                        self.system_halt = True
+                        self.shutdown()
+                    else:
+                        self.abort()
+                        self.shutdown_timestamp = timestamp
 
                 else:
                     print('WARNING: unknown event - {}'.format(event))

@@ -37,6 +37,8 @@ MOTOR_STEP_PER_REVOLUTION = 200
 # overheat threshold temperature
 THRESHOLD_TEMPERATURE = 50
 
+# max delay for double push of shutdown button
+SHUTDOWN_DELAY = 1
 
 class Pin:
     MOTOR_DIR = 20
