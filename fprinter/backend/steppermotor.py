@@ -1,8 +1,9 @@
+import queue
+# TODO use multiprocessing instead of threading
+import threading
 import time
 
 import RPi.GPIO as GPIO
-import queue
-import threading
 
 from fprinter.backend import constants
 
@@ -95,9 +96,9 @@ class StepMotor:
             steps, delay, status = command
             status.processing = True
 
-            direction = GPIO.HIGH
+            direction = GPIO.LOW
             if steps < 0:
-                direction = GPIO.LOW
+                direction = GPIO.HIGH
                 steps = -steps
 
             GPIO.output(self.direction_pin, direction)
@@ -116,11 +117,11 @@ class StepMotor:
 
                 if GPIO.input(self.end_course_top) == StepMotor.END_COURSE_PRESSED:
                     end_course = True
-                    GPIO.output(self.direction_pin, GPIO.LOW)
+                    GPIO.output(self.direction_pin, GPIO.HIGH)
 
                 elif GPIO.input(self.end_course_bottom) == StepMotor.END_COURSE_PRESSED:
                     end_course = True
-                    GPIO.output(self.direction_pin, GPIO.HIGH)
+                    GPIO.output(self.direction_pin, GPIO.LOW)
 
                 if end_course:
                     for _ in range(constants.END_COURSE_STEPS):
@@ -146,4 +147,4 @@ class StepMotor:
 
     @staticmethod
     def total_delay(steps, delay):
-        return (2 * steps + 1) * delay
+        return 2 * steps * delay

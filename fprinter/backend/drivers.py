@@ -3,6 +3,7 @@ import logging
 
 from fprinter.backend import constants
 from fprinter.backend.buttons import Buttons
+from fprinter.backend.lcd import LCD
 from fprinter.backend.security import Security
 from fprinter.backend.steppermotor import StepMotor
 from fprinter.backend.temperature import Temperature
@@ -24,8 +25,7 @@ class HardwareDrivers:
         self.security = Security(constants.Pin.RELAYS)
         self.security.enable()
 
-        # TODO LCD
-        # self.lcd = LCD()
+        self.lcd = LCD()
         self.motor = StepMotor()
         # self.serial_projector = SerialProjector(self.fire_event)
         self.buttons = Buttons(self.fire_event)
@@ -86,11 +86,8 @@ class HardwareDrivers:
         :param line2: (str) message for second line
         :return: None
         """
-        # TODO LCD
-        # self.lcd.write(line1, line2)
+        self.lcd.write(line1, line2)
         logging.warning('LCD disabled, debug mode')
-        print(line1)
-        print(line2)
 
     def ready_projector(self):
         return True

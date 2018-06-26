@@ -40,6 +40,7 @@ THRESHOLD_TEMPERATURE = 50
 # max delay for double push of shutdown button
 SHUTDOWN_DELAY = 1
 
+
 class Pin:
     MOTOR_DIR = 20
     MOTOR_STEP = 21
@@ -60,9 +61,9 @@ class Pin:
 
 
 class SpeedMode:
-    SLOW = 0.140
-    MEDIUM = 0.080
-    FAST = 0.040
+    SLOW = 0.05
+    MEDIUM = 0.02
+    FAST = 0.01
 
 
 class MessageCode:

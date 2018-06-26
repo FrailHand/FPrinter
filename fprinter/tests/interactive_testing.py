@@ -74,10 +74,10 @@ class TestHardwareDrivers(unittest.TestCase):
         interactive_check(self, "when you press buttons, events are printed")
 
     def test_motor(self):
-        self.hardware.move_plate(10, constants.SpeedMode.FAST)
-        interactive_check(self, "plate moves up 10mm")
-        self.hardware.move_plate(-10, constants.SpeedMode.FAST)
-        interactive_check(self, "plate moves down 10mm")
+        self.hardware.move_plate(100, constants.SpeedMode.FAST)
+        interactive_check(self, "plate moves up 100mm")
+        self.hardware.move_plate(-100, constants.SpeedMode.FAST)
+        interactive_check(self, "plate moves down 100mm")
 
     def test_temperature(self):
         temp = self.hardware.temperature_sensors[0].update()
